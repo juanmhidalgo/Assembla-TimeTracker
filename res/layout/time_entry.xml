@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/timeEntryLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/txtSpaceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="space name" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/txtTicketName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ticket name" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/txtTicketDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ticket description" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/txtStartedAt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/started_at" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/txtElapsedTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/elapsed_time" >
+    </TextView>
+
+    <EditText
+        android:id="@+id/editLogMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:text="[previous log message]" >
+    </EditText>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" >
+
+        <Button
+            android:id="@+id/btnPauseResume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onPauseResumeClicked"
+            android:text="@string/pause_resume" >
+        </Button>
+
+        <Button
+            android:id="@+id/btnStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onStopClicked"
+            android:text="@string/stop" >
+        </Button>
+
+        <Button
+            android:id="@+id/btnMarkToTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onMarkToTestClicked"
+            android:text="Mark To Test" >
+        </Button>
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onCancelClicked"
+            android:text="@string/cancel" >
+        </Button>
+    </LinearLayout>
+
+</LinearLayout>

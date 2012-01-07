@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="User Settings">
+        <EditTextPreference android:summary="Assembla Username" android:title="User Name" android:key="username"></EditTextPreference>
+        <EditTextPreference android:summary="Assembla Password" android:title="Password" android:key="password"></EditTextPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

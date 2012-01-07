@@ -1,0 +1,4 @@
+proguard/
+dist/
+bin/
+gen/

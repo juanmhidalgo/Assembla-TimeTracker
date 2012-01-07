@@ -1,0 +1,27 @@
+//TIME TRACKER
+//if app is killed :
+//* log message is lost
+//* Saving a time entry takes so much time!!! => create a local database buffer ?
+//* What if internet is not available
+
+TODO: enlever la dependance des activités a l'application
+//* FIXED if task recording was paused, the button text is not restored to "Resume"
+
+
+
+TODO : SYNCRONISATION
+======================
+
+curl -i -X GET -H "Accept: application/xml" https://davidonlaptop@www.assembla.com/spaces/intuitia
+=> mais le ETag de la space ne change pas
+
+curl -i -X GET -H "Accept: application/xml" https://davidonlaptop@www.assembla.com/spaces/intuitia/tickets
+=> et ETag change si Est. Hours est changé (idem pour custom tag)
+
+curl -i -X GET -H "Accept: application/xml" https://davidonlaptop@www.assembla.com/spaces/intuitia/tickets/61
+=> Last-Modified change si Est. Hours est changé (idem pour custom tag)
+
+Idee : create a document file to keep track of change
+http://www.assembla.com/spaces/breakoutdocs/wiki/Document_REST_API
+but following call does not work :
+curl -i -X GET -H "Accept: application/xml" http://davidonlaptop@www.assembla.com/spaces/intuitia/documents
