@@ -7,6 +7,7 @@ import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
 import com.starredsolutions.assemblandroid.models.Ticket;
+import com.starredsolutions.utils.ActivityHelper;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -45,6 +46,8 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
     protected String getLogTag() { return TAG; }
     
     
+    final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
+    
     /*********************************************************************************************
      * ACTIVITY WORKFLOW METHODS
      *********************************************************************************************/
@@ -59,6 +62,7 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
         
         _app = TimeTrackerApplication.getInstance();
         
+        mActivityHelper.setupActionBar(getString(R.string.tickets_title) , 0, true);
         loadTickets();
     }
 

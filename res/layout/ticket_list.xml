@@ -1,55 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/main"
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_height="fill_parent"
-  android:layout_width="fill_parent">
-  
-  <!-- Header -->
-  <LinearLayout android:id="@+id/header"
-    android:background="#ff347c12"
-    android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     android:layout_width="fill_parent"
-    >
-    
-    <TextView android:id="@+id/item1"
-      android:layout_height="fill_parent"
-      android:layout_width="wrap_content"
-      android:width="5dip"
-      android:height="30dip"
-    />
-    <TextView android:id="@+id/item2"
-      android:layout_height="fill_parent"
-      android:layout_width="wrap_content"
-      android:text="@string/ticket"
-      android:width="240dip"
-      android:height="30dip"
-      android:textStyle="bold"
-      android:textSize="16sp"
-    />
-    <TextView android:id="@+id/item3"
-      android:layout_height="fill_parent"
-      android:layout_width="wrap_content"
-      android:text="@string/hours"
-      android:width="75dip"
-      android:height="30dip"
-      android:textStyle="bold"
-      android:textSize="16sp"
-    />
-  </LinearLayout>
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-  <!-- List Divider -->
-  <View android:layout_width="fill_parent"
-    android:layout_height="1dip"
-    android:background="?android:attr/listDivider" />
+    <include layout="@layout/actionbar" />
+    <!-- Header -->
 
-  <!-- ListView (grid_items) -->
-  <LinearLayout android:id="@+id/layout"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <ListView android:id="@+id/ticketListView"
-      android:layout_height="fill_parent"
-      android:layout_width="fill_parent">
-    </ListView>
-  </LinearLayout>
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#ff347c12" >
+
+        <TextView
+            android:id="@+id/item1"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:height="30dip"
+            android:width="5dip" />
+
+        <TextView
+            android:id="@+id/item2"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:height="30dip"
+            android:text="@string/ticket"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:width="240dip" />
+
+        <TextView
+            android:id="@+id/item3"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:height="30dip"
+            android:text="@string/hours"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:width="75dip" />
+    </LinearLayout>
+
+    <!-- List Divider -->
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="?android:attr/listDivider" />
+
+    <!-- ListView (grid_items) -->
+
+    <LinearLayout
+        android:id="@+id/layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <ListView
+            android:id="@+id/ticketListView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+        </ListView>
+    </LinearLayout>
+
 </LinearLayout>

@@ -8,19 +8,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
-
 import org.dom4j.io.SAXReader;
 
+import android.text.TextUtils;
 import android.util.Log;
-import com.starredsolutions.assemblandroid.R;
+
 import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
@@ -56,8 +51,6 @@ public class AssemblaAPIAdapter {
 		return instance;
 	}
 	
-	private DocumentBuilderFactory builderFactory;
-	private DocumentBuilder builder;
 	private SAXReader reader = new SAXReader(); // dom4j SAXReader
 
 	
@@ -86,16 +79,6 @@ public class AssemblaAPIAdapter {
 	private AssemblaAPIAdapter() throws XMLParsingException {
 		
 		
-		// parse the XML as a W3C Document
-		builderFactory = DocumentBuilderFactory.newInstance();
-		builderFactory.setNamespaceAware(true);
-		
-		try {
-			builder = builderFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new XMLParsingException("FATAL: Was unable to create a new DocumentBuilder. " +
-					"You need to restart the application.", e, true);
-		}
 	}
 	
 	
@@ -133,6 +116,50 @@ public class AssemblaAPIAdapter {
         return client.getResponse();
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private String getNodeValueAsString(Node node){
+		if(node == null){
+			return "";
+		}
+		return node.getStringValue();
+	}
+	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private Integer getNodeValueAsInteger(Node node){
+		if(node == null){
+			return null;
+		}
+		String value = this.getNodeValueAsString(node);
+		if(value != null){
+			return new Integer(value);
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private Float getNodeValueAsFloat(Node node){
+		if(node == null){
+			return null;
+		}
+		String value = this.getNodeValueAsString(node);
+		if(value != null){
+			return new Float(value);
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * GET http://www.assembla.com/spaces/<space_id>
@@ -156,12 +183,11 @@ public class AssemblaAPIAdapter {
         
         String id, name, description;
 		try {
-//			Document doc = builder.parse( stringToInputStream(response) );
-			org.dom4j.Document doc = reader.read( stringToInputStream(response) );
+			Document doc = reader.read( stringToInputStream(response) );
 			
-			id 			= doc.selectSingleNode("/space/id").getStringValue();
-			name        = doc.selectSingleNode("/space/name").getStringValue();
-			description = doc.selectSingleNode("/space/description").getStringValue();
+			id 			= this.getNodeValueAsString(doc.selectSingleNode("/space/id"));
+			name        = this.getNodeValueAsString(doc.selectSingleNode("/space/name"));
+			description = this.getNodeValueAsString(doc.selectSingleNode("/space/description"));
 			
 			return new Space(id, name, description);
 			
@@ -203,15 +229,12 @@ public class AssemblaAPIAdapter {
 			for(int i=0; i<nodes.size() ; i++) {
 				org.dom4j.Node node = nodes.get(i);
 				
-				
-				id          = node.selectSingleNode("id").getStringValue();
-				name        = node.selectSingleNode("name").getStringValue();
-				description = node.selectSingleNode("description").getStringValue();
+				id          = this.getNodeValueAsString(node.selectSingleNode("id"));
+				name        = this.getNodeValueAsString(node.selectSingleNode("name"));
+				description = this.getNodeValueAsString(node.selectSingleNode("description"));
 				
 				timer.stop();
 				
-				//Space space = new Space(id, name, description);
-				//Log.e("***********", "Space: " + space.toString());
 				spaces.add( new Space(id, name, description) );
 				
 				timer.resume();
@@ -259,14 +282,11 @@ public class AssemblaAPIAdapter {
 		try {
 			Document doc = reader.read( stringToInputStream(response) );
 			
-			userId = doc.selectSingleNode("/user/id").getStringValue();
+			userId = this.getNodeValueAsString(doc.selectSingleNode("/user/id"));
 			
 			MyTimer.stop("XMLParsingUserProfile");
 
-			//throw new SAXException("dumb sax exception"); // TEMPORARY EXCEPTION
-			
 			return userId;
-			
 		} catch (Exception e) {
 			throw new XMLParsingException("Error occured while parsing user profile XML", e);
 		}
@@ -293,10 +313,11 @@ public class AssemblaAPIAdapter {
 		{
 		String url;
 		
-		if (includeClosed)
+		if (includeClosed){
 			url = "http://www.assembla.com/spaces/" + spaceId + "/tickets/report/0";
-		else
+		}else{
 			url = "https://www.assembla.com/spaces/" + spaceId + "/tickets";
+		}
 		
 		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
@@ -327,65 +348,44 @@ public class AssemblaAPIAdapter {
 				Node node = nodes.get(i);
 				
 				// First, check that the ticket belongs to me, or is unassigned
-				assignedToId = (String) node.selectSingleNode("assigned-to-id").getStringValue();
+				assignedToId = this.getNodeValueAsString(node.selectSingleNode("assigned-to-id"));
 				
 				// Filter other people tickets if requested
 				if (!includeOthers) {
 					if ( !assignedToId.equals(userId) && assignedToId.length() > 0)  {
-						//Log.i(TAG, "Skipping a ticket assigned to user '" + assignedToId + "' (my ID=" + userId + ")");
 						skippedTickets++;
 						continue;
-						// Loop over to next node
 					}
 				}
 				
-				id           = new Integer(node.selectSingleNode("id").getStringValue());
-				number       = new Integer(node.selectSingleNode("number").getStringValue());
-				priority     = new Integer(node.selectSingleNode("priority").getStringValue());
-				/**
-				 * @todo el estado puede ser null OJO
-				 */
-				try{
-					status       = new Integer(node.selectSingleNode("status").getStringValue());
-				}catch(Exception e){
-					e.printStackTrace();
-					status = 0;
-				}
-				statusName   = node.selectSingleNode("status-name").getStringValue();
-				description  = node.selectSingleNode("description").getStringValue();
-				summary      = node.selectSingleNode("summary").getStringValue();;
-				workingHours = new Float(node.selectSingleNode("working-hours").getStringValue());
+				id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
+				number       = this.getNodeValueAsInteger(node.selectSingleNode("number"));
+				priority     = this.getNodeValueAsInteger(node.selectSingleNode("priority"));
+				status       = this.getNodeValueAsInteger(node.selectSingleNode("status"));
+				
+				statusName   = this.getNodeValueAsString(node.selectSingleNode("status-name"));
+				description  = this.getNodeValueAsString(node.selectSingleNode("description"));
+				summary      = this.getNodeValueAsString(node.selectSingleNode("summary"));
+				workingHours = this.getNodeValueAsFloat(node.selectSingleNode("working-hours"));
 				
 				description  = decodeHTML(description);
 				
 				// Save workedHours only if the custom-field is present
-				String tmpStr = "";
-				try{
-					tmpStr = (String) node.selectSingleNode("custom-fields/custom-field[@name='workedhours']").getStringValue();
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+				String tmpStr = this.getNodeValueAsString(node.selectSingleNode("custom-fields/custom-field[@name='workedhours']"));
 				
-				workedHours   = (tmpStr.length() > 0) ?  new Float(tmpStr) : 0.0f;
-				String lastLogMsg = "";
+				workedHours   =  !TextUtils.isEmpty(tmpStr) ?  new Float(tmpStr) : 0.0f;
 				
-				try{
-					lastLogMsg = (String) node.selectSingleNode("custom-fields/custom-field[@name='lastlogmessage']").getStringValue();
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+				String lastLogMsg = this.getNodeValueAsString(node.selectSingleNode("custom-fields/custom-field[@name='lastlogmessage']"));
 				
 				// overwrite the spaceId received as argument
-				spaceId      = (String) node.selectSingleNode("space-id").getStringValue();
+				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
 				
 				timer.stop();
 				
 				Ticket ticket = new Ticket(id, number, priority, status, statusName, description, 
 						summary, workingHours, workedHours, spaceId, assignedToId, lastLogMsg);
 				
-				//Log.e("***********", "Ticket: " + ticket.toString());
 				tickets.add(ticket);
-				
 				timer.resume();
 			}
 			
@@ -449,19 +449,17 @@ public class AssemblaAPIAdapter {
 			for(int i=0; i<nodes.size() ; i++) {
 				Node node = nodes.get(i);
 				
-				id           = new Integer(node.selectSingleNode("id").getStringValue());
-				
-				hours        = new Float(node.selectSingleNode("hours").getStringValue());
-				description  = node.selectSingleNode("description").getStringValue();
-				ticketId     = new Integer(node.selectSingleNode("ticket-id").getStringValue());
-				userId       = node.selectSingleNode("user-id").getStringValue();
+				id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
+				hours        = this.getNodeValueAsFloat(node.selectSingleNode("hours"));
+				description  = this.getNodeValueAsString(node.selectSingleNode("description"));
+				ticketId     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-id"));
+				userId       = this.getNodeValueAsString(node.selectSingleNode("user-id"));
 				// overwrite the spaceId received as argument
-				spaceId      = node.selectSingleNode("space-id").getStringValue();
+				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
 
 				timer.stop();
 				
 				Task task = new Task(id, beginAt, endAt, hours, description, spaceId, ticketId, number, userId);
-				//Log.e("***********", "Task: " + task.toString());  // bugs here
 				tasks.add(task);
 				
 				timer.resume();

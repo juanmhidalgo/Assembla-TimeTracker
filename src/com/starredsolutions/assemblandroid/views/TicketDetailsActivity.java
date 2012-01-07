@@ -9,6 +9,7 @@ import com.starredsolutions.assemblandroid.UIController;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
+import com.starredsolutions.utils.ActivityHelper;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -47,6 +48,8 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
     protected String getLogTag() { return TAG; }
     
     
+    final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
+    
     /*********************************************************************************************
      * ACTIVITY WORKFLOW METHODS
      *********************************************************************************************/
@@ -69,6 +72,8 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
         _txtDescription = (TextView) layout.findViewById(R.id.txtDescription);
         
         _listView = (ListView)findViewById(R.id.taskListView);
+        
+        mActivityHelper.setupActionBar(getString(R.string.tickets_detail_title) , 0, true);
         
         loadTasks(false);
     }
