@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import com.starredsolutions.assemblandroid.R;
 
 
 /**

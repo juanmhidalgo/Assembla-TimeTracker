@@ -85,7 +85,9 @@ public class AssemblaAPIAdapter {
 	public void setCredentials(String username, String password) throws XMLParsingException, RestfulException, AssemblaAPIException {
 		this.username = username;
 		this.password = password;
+		
 		getMyUserId();
+		
 	}
 	
 	private String request(RequestMethod method, String url) throws RestfulException {
@@ -111,8 +113,6 @@ public class AssemblaAPIAdapter {
         
         client.execute();
         
-        //info.setText("Response : " + Integer.toString(client.getResponseCode())
-        //		+ " " + client.getResponse() + "\nErrors: " + client.getErrorMessage());
         return client.getResponse();
 	}
 	
@@ -266,6 +266,7 @@ public class AssemblaAPIAdapter {
 	 */
 	public String getMyUserId() throws XMLParsingException, RestfulException, AssemblaAPIException {
 		// HTTPS unsupported !?!?
+		
 		String url = "http://www.assembla.com/user/best_profile/" + username;
 		
 		MyTimer.resume("URLRequests");

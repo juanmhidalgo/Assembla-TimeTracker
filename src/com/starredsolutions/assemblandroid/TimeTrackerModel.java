@@ -1,15 +1,14 @@
 package com.starredsolutions.assemblandroid;
 
-import com.starredsolutions.assemblandroid.R;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.net.RestfulException;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 
 
 public class TimeTrackerModel
