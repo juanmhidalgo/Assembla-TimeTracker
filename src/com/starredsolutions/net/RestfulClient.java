@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -17,6 +16,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -30,9 +30,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
-import com.starredsolutions.utils.MyTimer;
-
+import android.content.Context;
 import android.util.Log;
+
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
+import com.starredsolutions.utils.MyTimer;
+import com.starredsolutions.utils.Utils;
 
 
 /**
@@ -47,6 +50,8 @@ public class RestfulClient {
 	public boolean log = true;
 	public boolean verbose = false;
 	
+	
+	private final Context context;
     private String url;
     
     private RequestMethod method;
@@ -54,7 +59,7 @@ public class RestfulClient {
 	private ArrayList <NameValuePair> params;
     private ArrayList <NameValuePair> headers;
 
-	private DefaultHttpClient client;
+	private HttpClient client;
  
     // Only HTTP Basic authentication is supported for now 
     private Credentials credentials = null;
@@ -72,6 +77,7 @@ public class RestfulClient {
 
     
     public RestfulClient(RequestMethod method, String url) {
+    	this.context = TimeTrackerApplication.getInstance().getApplicationContext();
     	newRequest(method, url);
     }
     
@@ -82,7 +88,8 @@ public class RestfulClient {
         this.params = new ArrayList<NameValuePair>();
         this.headers = new ArrayList<NameValuePair>();
         
-        this.client = new DefaultHttpClient();
+        //this.client = new DefaultHttpClient();
+        this.client = Utils.getHttpClient(this.context);
         
         this.statusCode = 0;
         this.statusPhrase = this.responseBody = this.messageBody = "";
@@ -177,8 +184,7 @@ public class RestfulClient {
 	        
 	        AuthScope scope = new AuthScope(uri.getHost(), uri.getPort());
 	        //AuthScope scope = new AuthScope(uri.getHost(), uri.getPort(), AuthScope.ANY_SCHEME);
-	        
-	        client.getCredentialsProvider().setCredentials(scope, credentials);
+	        ((DefaultHttpClient)  client).getCredentialsProvider().setCredentials(scope, credentials);
         }
  
         try {
