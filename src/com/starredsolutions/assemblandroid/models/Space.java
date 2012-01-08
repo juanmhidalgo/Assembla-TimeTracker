@@ -74,6 +74,7 @@ public class Space implements Serializable
 	}
 
 	public String name() { return this.name; }
+	public String getName() { return this.name; }
 	
 	public String toString() {
 		try {

@@ -12,13 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.UIController;
+import com.starredsolutions.assemblandroid.adapters.SpaceAdapter;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
 import com.starredsolutions.utils.ActivityHelper;
 
@@ -36,6 +36,7 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
 	private ProgressDialog _loadingDialog;
 	
 	final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
+	private static SpaceAdapter adapter;
 	
 	
 
@@ -50,8 +51,21 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
         _app = TimeTrackerApplication.getInstance();
 
         setContentView(R.layout.project_list);
-        
         mActivityHelper.setupActionBar(getString(R.string.projects_title) , 0, false);
+        
+        
+        adapter = new SpaceAdapter(this, R.layout.list_item, _app.getSpaces());
+        adapter.setNotifyOnChange(true);
+        setListAdapter(adapter);
+        
+        ListView lv = getListView();
+        lv.setTextFilterEnabled(true);
+
+        lv.setOnItemClickListener( new OnItemClickListener(){
+        	public void onItemClick( AdapterView<?> parent, View view, int position, long id ){
+        		UIController.getInstance().onProjectSelected( ProjectsListingActivity.this, position );
+        	}
+        });
         
         loadProjects(false);
     }
@@ -125,19 +139,6 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
 	public void onUpdate() {
 		//Log.i(TAG, "onUpdate");
 		if (_app.projectsReady()) {
-			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, _app.projectNamesForList() ));
-	
-	        ListView lv = getListView();
-	        lv.setTextFilterEnabled(true);
-	
-	        lv.setOnItemClickListener( new OnItemClickListener()
-	        {
-	        	public void onItemClick( AdapterView<?> parent, View view, int position, long id )
-	        	{
-	        		UIController.getInstance().onProjectSelected( ProjectsListingActivity.this, position );
-	        	}
-	        });
-	        
 	        hideLoadingDialog();
 		}
 	}

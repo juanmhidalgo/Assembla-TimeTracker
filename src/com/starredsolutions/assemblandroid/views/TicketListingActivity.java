@@ -1,14 +1,6 @@
 package com.starredsolutions.assemblandroid.views;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.starredsolutions.assemblandroid.R;
-import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
-import com.starredsolutions.assemblandroid.models.Ticket;
-import com.starredsolutions.utils.ActivityHelper;
-
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,8 +13,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.starredsolutions.assemblandroid.R;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
+import com.starredsolutions.assemblandroid.UIController;
+import com.starredsolutions.assemblandroid.adapters.TicketAdapter;
+import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
+import com.starredsolutions.utils.ActivityHelper;
 
-public class TicketListingActivity extends BaseActivity implements IAsynctaskObserver
+
+public class TicketListingActivity extends ListActivity implements IAsynctaskObserver
 {
     /*********************************************************************************************
      * CONSTANTS
@@ -47,22 +46,38 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
     
     
     final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
-    
+    private static TicketAdapter adapter;
     /*********************************************************************************************
      * ACTIVITY WORKFLOW METHODS
      *********************************************************************************************/
 
-    @Override protected void onCreate(Bundle savedInstanceState)
-    {
+    @Override protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        
-        setContentView(R.layout.ticket_list);
-        
-        _listView = (ListView)findViewById(R.id.ticketListView);
-        
+        UIController.getInstance().onActivityCreated(this);
         _app = TimeTrackerApplication.getInstance();
         
+        setContentView(R.layout.ticket_list);
         mActivityHelper.setupActionBar(getString(R.string.tickets_title) , 0, true);
+        
+        adapter = new TicketAdapter(this, R.layout.ticket_list_item, _app.ticketsForList());
+        adapter.setNotifyOnChange(true);
+        setListAdapter(adapter);
+        
+        
+        _listView = getListView();
+        _listView.setOnItemClickListener( new OnItemClickListener() {
+        	public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
+        		// When clicked, show a toast with the TextView text
+        		//Log.i(TAG, "OnItemClickListener :: Position:" + Integer.toString(position) + " / id:" + Long.toString(id) + " / " + allTickets.get(position).toString());
+        		
+        		_app.selectTicket( position );
+					
+				// Launch another activity
+                Intent myIntent = new Intent(TicketListingActivity.this, TicketDetailsActivity.class);
+                TicketListingActivity.this.startActivity(myIntent);
+        	}
+        });
+        
         loadTickets();
     }
 
@@ -80,7 +95,6 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
      * Called when the options button (bottom left) is pressed
      */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenu", "");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tickets_listing_activity, menu);
         return true;
@@ -88,7 +102,6 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
 
     // This method is called once the menu is selected
     @Override public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected", "");
         
         switch (item.getItemId()) {
             case R.id.preferences:
@@ -114,52 +127,12 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
      * Called when tickets are ready
      */
 	public void onUpdate() {
-		log("onUpdate", "");
-		
 		if (_app.ticketsReady()) {
-			ArrayList<Ticket> tickets = _app.ticketsForList();
-			
-			// create the grid item mapping
-	        String[] from = new String[] {"A", "B", "C"};
-	        int[] to = new int[] { R.id.item1, R.id.item2, R.id.item3};
-
-	        // prepare the list of all records
-	        ArrayList<HashMap<String, String>> items = new ArrayList<HashMap<String, String>>();
-	        
-	        if (tickets != null) {
-		        for(Ticket t : tickets) {
-		        	HashMap<String, String> hash = new HashMap<String, String>();
-		        	hash.put("A", Integer.toString(t.priority()) );
-		        	hash.put("B", t.name());
-		        	hash.put("C", String.format("%s / %s", t.workedHoursHuman(), t.workingHoursHuman()) );
-		        	
-		        	items.add(hash);
-		        }
-	        }
-			
-	    	TicketListAdapter adapter = new TicketListAdapter(this, items, R.layout.ticket_list_item, from, to);
-	    	
-	    	_listView.setAdapter(adapter);
-
-	    	_listView.setOnItemClickListener( new OnItemClickListener() {
-	        	public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
-	        		// When clicked, show a toast with the TextView text
-	        		//Log.i(TAG, "OnItemClickListener :: Position:" + Integer.toString(position) + " / id:" + Long.toString(id) + " / " + allTickets.get(position).toString());
-	        		
-	        		_app.selectTicket( position );
-						
-					// Launch another activity
-	                Intent myIntent = new Intent(TicketListingActivity.this, TicketDetailsActivity.class);
-	                TicketListingActivity.this.startActivity(myIntent);
-	        	}
-	        });
-	        
-	        hideLoadingDialog();
+			hideLoadingDialog();
 		}
 	}
 
 	public void onUpdateFailed(Exception exception) {
-		log("onUpdateFailed ", exception.getMessage());
 		hideLoadingDialog();
 	}
 
@@ -168,8 +141,7 @@ public class TicketListingActivity extends BaseActivity implements IAsynctaskObs
      * INTERNAL METHODS
      *********************************************************************************************/
     
-    private void loadTickets()
-    {
+    private void loadTickets(){
         loadTickets(false);
     }
     

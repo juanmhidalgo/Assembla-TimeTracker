@@ -208,6 +208,10 @@ public class TimeTrackerApplication extends Application
 		}
 	}
 	
+	public ArrayList<Space> getSpaces(){
+		return _model.spaces();
+	}
+	
 	public ArrayList<String> projectNamesForList()
 	{
 		ArrayList<String> projectNames = new ArrayList<String>();

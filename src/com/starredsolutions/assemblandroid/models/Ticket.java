@@ -89,7 +89,9 @@ public class Ticket implements Serializable
 	public int id()             { return this.id; }
 	public int number()         { return this.number; }
 	public int priority()       { return this.priority; }
+	public int getPriority()       { return this.priority; }
 	public String name()        { return this.summary; }
+	public String getName()     { return this.summary; }
 	public int status()         { return this.status; }
 	public String statusName()  { return this.statusName; }
 	public String description() { return this.description; }
