@@ -1,5 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="label">Assembla TimeTracker</string>
+    
+    <string name="login_activity_username_label">Username</string>
+    <string name="login_activity_password_label">Password</string>
+    <string name="login_activity_ok_button">Sign in</string>
+    <!-- Message shown in progress dialog while app connects to the server -->
+    <string
+        name="ui_activity_authenticating">Authenticating\u2026</string>
+    <!-- Message shown in dialog if the username or password is invalid. -->
+    <string
+        name="login_activity_loginfail_text_both">The username or password isn\'t valid. A Sample SyncAdapter account is
+        required. Please try again. </string>
+        
+    <!-- Message shown in dialog if the password is invalid -->
+    <string
+        name="login_activity_loginfail_text_pwonly">You entered the wrong password or your account has changed.
+        Please re-enter your password.</string>
+    <!-- Message shown in dialog to prompt the user for their password -->
+    <string
+        name="login_activity_loginfail_text_pwmissing">Type the password for this account.</string>
+    
+    <!--
+        Message shown if the provided account doesn't support the current
+        activity.
+    -->
+    <string
+        name="login_activity_newaccount_text">Sign in to your Assembla account. </string>
+    
+    <string
+        name="ui_activity_title">Sign-in</string>
+    
+    <!-- Button that takes the user to the "sign in" screen -->
+    <string
+        name="sign_in_button_label">Sign in</string>
+    <!-- Button for going to the previous screen or step -->
+    <string
+        name="back_button_label">Back</string>
+    <!-- Button to cancel the current operation -->
+    <string
+        name="cancel_button_label">Cancel</string>
+    <string
+        name="profile_action">Sample profile</string>
+    <string
+        name="view_profile">View Profile</string>
+    
+    <string name="username">Username:</string>
+    <string name="username_hint">efudd</string>
+    <string name="password">Password:</string>
+    <string name="password_hint">w4bb1ts!</string>
+    <string name="login">Login</string>
+    <string name="authenticating">Authenticating</string>
+    
     <string name="description_home">Home</string>
     <string name="app_name">Time Tracker</string>
     <string name="start">Start</string>
@@ -7,6 +60,8 @@
     <string name="cancel">Cancel</string>
     <string name="pause_resume">Start / Pause</string>
     
+    
+    <string name="spaces_title">Assembla Spaces</string>
     
     <string name="projects_title">Assembla Projects</string>
     <string name="tickets_title">Tickets</string>

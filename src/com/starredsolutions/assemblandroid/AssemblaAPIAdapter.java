@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -267,7 +266,7 @@ public class AssemblaAPIAdapter {
 	public String getMyUserId() throws XMLParsingException, RestfulException, AssemblaAPIException {
 		// HTTPS unsupported !?!?
 		
-		String url = "http://www.assembla.com/user/best_profile/" + username;
+		String url = "https://www.assembla.com/user/best_profile/" + username;
 		
 		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
@@ -315,7 +314,7 @@ public class AssemblaAPIAdapter {
 		String url;
 		
 		if (includeClosed){
-			url = "http://www.assembla.com/spaces/" + spaceId + "/tickets/report/0";
+			url = "http://www.assembla.com/spaces/" + spaceId + "/tickets/report/7";
 		}else{
 			url = "https://www.assembla.com/spaces/" + spaceId + "/tickets";
 		}
@@ -369,7 +368,7 @@ public class AssemblaAPIAdapter {
 				summary      = this.getNodeValueAsString(node.selectSingleNode("summary"));
 				workingHours = this.getNodeValueAsFloat(node.selectSingleNode("working-hours"));
 				
-				description  = decodeHTML(description);
+				description  = TextUtils.htmlEncode(description);
 				
 				// Save workedHours only if the custom-field is present
 				String tmpStr = this.getNodeValueAsString(node.selectSingleNode("custom-fields/custom-field[@name='workedhours']"));
@@ -498,7 +497,7 @@ public class AssemblaAPIAdapter {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
 			"<task>" + 
 			"	<hours>" + Float.toString(task.elapsedHours()) + "</hours>" + 
-			"	<description>" + encodeHTML(task.description()) + "</description>" + 
+			"	<description>" + TextUtils.htmlEncode(task.description()) + "</description>" + 
 			"	<begin-at>" + task.beginAt() + "</begin-at>" + 
 			"	<end-at>" + task.endAt() + "</end-at>" +   			// 2011-05-04 17:15 UTC 
 			"	<space-id>" + space.id() + "</space-id>" + 
@@ -523,7 +522,7 @@ public class AssemblaAPIAdapter {
 			+ "  <status>" + Integer.toString(ticket.status()) + "</status>"
 			+ "  <custom-fields>"
 			+ "    <workedhours>" + Float.toString(ticket.workedHours()) + "</workedhours>"
-			+ "    <lastlogmessage>" + encodeHTML(task.description()) + "</lastlogmessage>"
+			+ "    <lastlogmessage>" + TextUtils.htmlEncode(task.description()) + "</lastlogmessage>"
 			+ "  </custom-fields>"
 			+ "</ticket>";
 		
@@ -564,22 +563,6 @@ public class AssemblaAPIAdapter {
 		}
 	}
 	
-	
-	/**
-	 * Don't know if it works ; never had to use it!
-	 * 
-	 * http://stackoverflow.com/questions/2918920/decode-html-entities-in-android
-	 * 
-	 * @param html
-	 * @return String escaped
-	 */
-	static private String decodeHTML( String html ) {
-		return StringEscapeUtils.unescapeHtml( html );
-	}
-	
 
-	static private String encodeHTML( String text ) {
-		return StringEscapeUtils.escapeHtml( text );
-	}
 	
 }

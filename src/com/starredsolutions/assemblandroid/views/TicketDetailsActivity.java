@@ -143,7 +143,7 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
     {
         _txtName.setText(_ticket.shortFormattedName());
         
-        _txtStatus.setText("Status: " + _ticket.statusName() +  (_ticket.unassigned() ? "   (UNASSIGNED)" : "")  );
+        _txtStatus.setText("Status: " + _ticket.getStatusName() +  (_ticket.unassigned() ? "   (UNASSIGNED)" : "")  );
         
         int percent = Math.round( 100 * _ticket.workedHours() / _ticket.workingHours() );
         _txtHours.setText("Hours:  " 

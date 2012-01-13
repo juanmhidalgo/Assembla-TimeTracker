@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.UIController;
-import com.starredsolutions.assemblandroid.adapters.SpaceAdapter;
+import com.starredsolutions.assemblandroid.adapter.SpaceCursorAdapter;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
 import com.starredsolutions.utils.ActivityHelper;
 
@@ -36,7 +36,7 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
 	private ProgressDialog _loadingDialog;
 	
 	final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
-	private static SpaceAdapter adapter;
+	private static SpaceCursorAdapter adapter;
 	
 	
 
@@ -54,9 +54,6 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
         mActivityHelper.setupActionBar(getString(R.string.projects_title) , 0, false);
         
         
-        adapter = new SpaceAdapter(this, R.layout.list_item, _app.getSpaces());
-        adapter.setNotifyOnChange(true);
-        setListAdapter(adapter);
         
         ListView lv = getListView();
         lv.setTextFilterEnabled(true);

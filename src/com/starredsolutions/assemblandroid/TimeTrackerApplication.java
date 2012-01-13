@@ -3,16 +3,17 @@ package com.starredsolutions.assemblandroid;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import com.starredsolutions.assemblandroid.R;
+
 import com.starredsolutions.assemblandroid.TimeTrackerModel.ACTIVITY;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
 import com.starredsolutions.assemblandroid.asyncTask.IProjectsLoadingListener;
@@ -28,8 +29,8 @@ import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Task;
-import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.assemblandroid.models.Task.State;
+import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.assemblandroid.views.DialogThemedActivity;
 import com.starredsolutions.net.RestfulException;
 
@@ -91,12 +92,7 @@ public class TimeTrackerApplication extends Application
 	 */
 	public TimeTrackerApplication() {
 	    _starting = true;
-		Log.i(TAG, "new TimeTrackerApplication");
-		
-		if (instance != null)
-			Log.w(TAG, "WARNING: TimeTrackerApplication instanciated more than once! "
-					+ "Now using last created instance.\n ALL EXISTING VALUES WILL BE LOST");
-		
+	    
 		instance = this;
 	}
 	
@@ -173,6 +169,7 @@ public class TimeTrackerApplication extends Application
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		/*
 		_starting = true;
 		Log.i(TAG, "TimeTrackingApplication starting... ");
 		
@@ -192,7 +189,7 @@ public class TimeTrackerApplication extends Application
 
         _snapshotManager = new SnapshotManager(this);
         restoreState();
-        _starting = false;
+        _starting = false;*/
 	}
 	
 	public void reloadPreferences()

@@ -36,6 +36,8 @@ public class Space implements Serializable
     private ParsedArrayList<Ticket> tickets = null;
 	
 	public String id() { return this.id; }
+	public String getId() { return this.id; }
+	public String getDescription() { return this.description; }
 	public String listItemText() { return this.name; }
 	
 	

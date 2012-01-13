@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.UIController;
-import com.starredsolutions.assemblandroid.adapters.TicketAdapter;
+import com.starredsolutions.assemblandroid.adapter.TicketCursorAdapter;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
 import com.starredsolutions.utils.ActivityHelper;
 
@@ -46,7 +46,7 @@ public class TicketListingActivity extends ListActivity implements IAsynctaskObs
     
     
     final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
-    private static TicketAdapter adapter;
+    private static TicketCursorAdapter adapter;
     /*********************************************************************************************
      * ACTIVITY WORKFLOW METHODS
      *********************************************************************************************/
@@ -59,10 +59,10 @@ public class TicketListingActivity extends ListActivity implements IAsynctaskObs
         setContentView(R.layout.ticket_list);
         mActivityHelper.setupActionBar(getString(R.string.tickets_title) , 0, true);
         
-        adapter = new TicketAdapter(this, R.layout.ticket_list_item, _app.ticketsForList());
+        /*adapter = new TicketCursorAdapter(this, R.layout.ticket_list_item, _app.ticketsForList());
         adapter.setNotifyOnChange(true);
         setListAdapter(adapter);
-        
+        */
         
         _listView = getListView();
         _listView.setOnItemClickListener( new OnItemClickListener() {

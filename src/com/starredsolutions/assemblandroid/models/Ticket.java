@@ -87,18 +87,23 @@ public class Ticket implements Serializable
 	}
 	
 	public int id()             { return this.id; }
+	public int getId()             { return this.id; }
 	public int number()         { return this.number; }
+	public int getNumber()         { return this.number; }
 	public int priority()       { return this.priority; }
 	public int getPriority()       { return this.priority; }
 	public String name()        { return this.summary; }
 	public String getName()     { return this.summary; }
 	public int status()         { return this.status; }
-	public String statusName()  { return this.statusName; }
+	public String getStatusName()  { return this.statusName; }
 	public String description() { return this.description; }
+	public String getDescription() { return this.description; }
 	public Float workedHours()  { return this.workedHours; }
 	public Float workingHours() { return this.workingHours; }
+	public Float getWorkingHours() { return this.workingHours; }
 	public String lastLogMessage() { return this.lastLogMessage; }
 	public boolean unassigned() { return !(this.assignedToId.length() > 0); }
+	public String getAssignedToId() { return this.assignedToId; }
 	
 	public void addWorkingHours(float hours) {
 		this.workedHours += hours;
