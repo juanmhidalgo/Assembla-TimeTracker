@@ -182,6 +182,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             
             // Set contacts sync for this account.
             ContentResolver.setSyncAutomatically(account,AssemblaContract.CONTENT_AUTHORITY, true);
+            
         } else {
             mAccountManager.setPassword(account, mPassword);
         }

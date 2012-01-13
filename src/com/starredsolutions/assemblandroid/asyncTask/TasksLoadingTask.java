@@ -2,9 +2,6 @@ package com.starredsolutions.assemblandroid.asyncTask;
 
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
-import com.starredsolutions.utils.MyTimer;
-
-import android.util.Log;
 
 public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayList<Task>> implements IAsynctaskObservable
 {
@@ -25,7 +22,6 @@ public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayL
 	protected ParsedArrayList<Task> doInBackground(Void... params) {
 		//Log.i(TAG, "doInBackground");
    		
-   		MyTimer.start(Task.TIMER_LOADING);
    		ParsedArrayList<Task> tasks;
 		try {
 			tasks  = _ticket.reloadTasks();
@@ -38,10 +34,9 @@ public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayL
 			_count     = 0;
 		}
 		
-        MyTimer.stop(Task.TIMER_LOADING);
         
-        _loadingSeconds = (int)MyTimer.get(Task.TIMER_LOADING).seconds();
-        _parsingSeconds = (int)MyTimer.get(Task.TIMER_PARSING).seconds();
+        _loadingSeconds = 0;
+        _parsingSeconds = 0;
         
 		return tasks;
 	}

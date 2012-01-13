@@ -34,7 +34,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.utils.MyTimer;
 import com.starredsolutions.utils.Utils;
 
 
@@ -188,9 +187,7 @@ public class RestfulClient {
         }
  
         try {
-        	MyTimer timer = MyTimer.resume("URLRequestsLowLevel");
         	httpResponse = client.execute(request);
-            timer.stop();
             
             
             statusCode = httpResponse.getStatusLine().getStatusCode();

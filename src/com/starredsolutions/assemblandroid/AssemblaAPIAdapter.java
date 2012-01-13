@@ -25,7 +25,6 @@ import com.starredsolutions.assemblandroid.models.TicketComparator;
 import com.starredsolutions.net.RequestMethod;
 import com.starredsolutions.net.RestfulClient;
 import com.starredsolutions.net.RestfulException;
-import com.starredsolutions.utils.MyTimer;
 
 /**
  * AssemblaAPIAdapter is responsible for communicating with the Assembla Web 
@@ -170,9 +169,7 @@ public class AssemblaAPIAdapter {
 	public Space getSpace( String spaceId ) throws RestfulException, XMLParsingException, AssemblaAPIException {
 		String url = "https://www.assembla.com/spaces/" + spaceId;
 		
-		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
-		MyTimer.stop("URLRequests");
 
         if (client.getStatusCode() != 200) {
 			String msg = "HTTP Error while retrieving Space. Expected status 200 OK, but got " + 
@@ -205,9 +202,7 @@ public class AssemblaAPIAdapter {
 	public ArrayList<Space> getMySpaces() throws XMLParsingException, RestfulException, AssemblaAPIException {
 		String url = "https://www.assembla.com/spaces/my_spaces";
 		
-		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
-		MyTimer.stop("URLRequests");
 
         if (client.getStatusCode() != 200) {
 			String msg = "HTTP Error while retrieving MySpaces. Expected status 200 OK, but got " + 
@@ -218,7 +213,6 @@ public class AssemblaAPIAdapter {
 		ArrayList<Space> spaces = new ArrayList<Space>();
         String id, name, description;
         
-        MyTimer timer = MyTimer.start(Space.TIMER_PARSING);
 		try {
 			Document doc = reader.read( stringToInputStream(response) );
 			
@@ -232,22 +226,15 @@ public class AssemblaAPIAdapter {
 				name        = this.getNodeValueAsString(node.selectSingleNode("name"));
 				description = this.getNodeValueAsString(node.selectSingleNode("description"));
 				
-				timer.stop();
 				
 				spaces.add( new Space(id, name, description) );
 				
-				timer.resume();
 			}
 			
 		}
 		catch (Exception e)
 		{
-			MyTimer.remove(Space.TIMER_PARSING);
 			throw new XMLParsingException("Error while parsing MySpaces XML", e);
-		}
-		finally
-		{
-			MyTimer.stop(Space.TIMER_PARSING);
 		}
 		
 		return spaces;
@@ -268,9 +255,7 @@ public class AssemblaAPIAdapter {
 		
 		String url = "https://www.assembla.com/user/best_profile/" + username;
 		
-		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
-		MyTimer.stop("URLRequests");
 
         if (client.getStatusCode() != 200) {
 			String msg = "HTTP Error while retrieving UserId. Expected status 200 OK, but got " + 
@@ -278,14 +263,11 @@ public class AssemblaAPIAdapter {
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
         
-		MyTimer.start("XMLParsingUserProfile");
 		try {
 			Document doc = reader.read( stringToInputStream(response) );
 			
 			userId = this.getNodeValueAsString(doc.selectSingleNode("/user/id"));
 			
-			MyTimer.stop("XMLParsingUserProfile");
-
 			return userId;
 		} catch (Exception e) {
 			throw new XMLParsingException("Error occured while parsing user profile XML", e);
@@ -319,9 +301,7 @@ public class AssemblaAPIAdapter {
 			url = "https://www.assembla.com/spaces/" + spaceId + "/tickets";
 		}
 		
-		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
-		MyTimer.stop("URLRequests");
 
         if (client.getStatusCode() != 200) {
 			String msg = "HTTP Error while retrieving Tickets. Expected status 200 OK, but got " + 
@@ -337,7 +317,6 @@ public class AssemblaAPIAdapter {
 		
 		skippedTickets = 0;
         
-		MyTimer timer = MyTimer.start(Ticket.TIMER_PARSING);
 		
 		try {
 			Document doc = reader.read( stringToInputStream(response) );
@@ -380,13 +359,11 @@ public class AssemblaAPIAdapter {
 				// overwrite the spaceId received as argument
 				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
 				
-				timer.stop();
 				
 				Ticket ticket = new Ticket(id, number, priority, status, statusName, description, 
 						summary, workingHours, workedHours, spaceId, assignedToId, lastLogMsg);
 				
 				tickets.add(ticket);
-				timer.resume();
 			}
 			
 			// Sort tickets
@@ -394,15 +371,10 @@ public class AssemblaAPIAdapter {
 			tickets.setSkippedItems(skippedTickets);
 			
 			
-		} catch (Exception e)
-		{
-			MyTimer.remove(Ticket.TIMER_PARSING);
+		} catch (Exception e){
 			throw new XMLParsingException("Error while parsing Tickets XML", e);
 		}
-		finally
-		{
-			MyTimer.stop(Ticket.TIMER_PARSING);
-		}
+
 		
 		return tickets;
 	}
@@ -422,9 +394,7 @@ public class AssemblaAPIAdapter {
 		
 		Log.i(LOG_TAG, "calling["+url+"]");
 		
-		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.GET, url);
-		MyTimer.stop("URLRequests");
         
 		if (client.getStatusCode() != 200) {
 			String msg = "HTTP Error while retrieving Tasks. Expected status 200 OK, but got " + 
@@ -439,10 +409,8 @@ public class AssemblaAPIAdapter {
 		float hours;
 		String description, userId;
 		
-		MyTimer timer = MyTimer.start(Task.TIMER_PARSING);
         try {
 			Document doc = reader.read( stringToInputStream(response) );
-
 			
 			List<Node> nodes =  (List<Node>) doc.selectNodes("/ticket/tasks/task");
 			
@@ -457,24 +425,13 @@ public class AssemblaAPIAdapter {
 				// overwrite the spaceId received as argument
 				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
 
-				timer.stop();
-				
 				Task task = new Task(id, beginAt, endAt, hours, description, spaceId, ticketId, number, userId);
 				tasks.add(task);
 				
-				timer.resume();
 			}
-		}
-        catch (Exception e)
-		{
-        	MyTimer.remove(Task.TIMER_PARSING);
+		}catch (Exception e){
 			throw new XMLParsingException("Error while parsing Tasks XML", e);
 		}
-		finally
-		{
-			MyTimer.stop(Task.TIMER_PARSING);
-		}
-		
 		return tasks;
 	}
 	
@@ -504,9 +461,7 @@ public class AssemblaAPIAdapter {
 			"	<ticket-id>" + ticket.id() + "</ticket-id>" + 
 			"</task>";
 		
-		MyTimer.resume("URLRequests");
 		String response = request(RequestMethod.POST, url, xml);
-		MyTimer.stop("URLRequests");
 		
 		if (client.getStatusCode() != 201) {
 			String msg = "HTTP Error while saving TimeEntry. Expected status 201 Created, but got " + 
@@ -526,9 +481,7 @@ public class AssemblaAPIAdapter {
 			+ "  </custom-fields>"
 			+ "</ticket>";
 		
-		MyTimer.resume("URLRequests");
 		response = request(RequestMethod.PUT, url, xml);
-		MyTimer.stop("URLRequests");
 		
 		if (client.getStatusCode() != 200) {
 			String msg = "HTTP Error while updating Ticket. Expected status 200 OK, but got " + 

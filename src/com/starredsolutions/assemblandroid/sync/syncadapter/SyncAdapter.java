@@ -27,7 +27,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
@@ -101,6 +100,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 							cv.put(Spaces.DESCRIPTION, sp.getDescription());
 							cv.put(Spaces.CREATED_AT, "");	
 							provider.insert(Spaces.CONTENT_URI, cv);
+							
+							
 						}
 						
 						tickets = AssemblaAPIAdapter.getInstance().getTicketsBySpaceId(sp.getId(), false, false);

@@ -6,6 +6,7 @@ package com.starredsolutions.assemblandroid.ui;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.Button;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
+import com.starredsolutions.assemblandroid.provider.AssemblaContract;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.sync.authenticator.AuthenticatorActivity;
 import com.starredsolutions.utils.ActivityHelper;
@@ -25,6 +27,7 @@ import com.starredsolutions.utils.ActivityHelper;
  */
 public class HomeActivity extends Activity{
 	static private final String TAG = "HomeActivity";
+	static private final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE);
 	protected final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
 	
 	@Override
@@ -41,6 +44,11 @@ public class HomeActivity extends Activity{
 	        final Bundle bundle = new Bundle();
 	        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
 	        startActivity(intent);
+		}else{
+			if(!ContentResolver.isSyncActive(ac[0], AssemblaContract.CONTENT_AUTHORITY) && !ContentResolver.isSyncPending(ac[0], AssemblaContract.CONTENT_AUTHORITY)){
+				if(LOGV) Log.v(TAG, "Request Sync");
+				ContentResolver.requestSync(ac[0], AssemblaContract.CONTENT_AUTHORITY, new Bundle());
+			}
 		}
         
         setContentView(R.layout.home_activity);

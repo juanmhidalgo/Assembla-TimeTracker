@@ -4,10 +4,6 @@ import java.util.ArrayList;
 
 import com.starredsolutions.assemblandroid.TimeTrackerModel;
 import com.starredsolutions.assemblandroid.models.Space;
-import com.starredsolutions.utils.MyTimer;
-
-
-import android.util.Log;
 
 
 public class ProjectsLoadingTask extends AssemblaAsyncTask<Void, Void, ArrayList<Space>>
@@ -32,7 +28,6 @@ public class ProjectsLoadingTask extends AssemblaAsyncTask<Void, Void, ArrayList
 	{
 		ArrayList<Space> spaces = null;
 		//Log.i(TAG, "doInBackground");
-		MyTimer.start(Space.TIMER_LOADING);
         try
         {
         	spaces = _model.reloadSpaces();     
@@ -44,10 +39,9 @@ public class ProjectsLoadingTask extends AssemblaAsyncTask<Void, Void, ArrayList
 			_count = 0;
 		}
         
-        MyTimer.stop(Space.TIMER_LOADING);
         
-        _loadingSeconds = (int) MyTimer.get(Space.TIMER_LOADING).seconds();
-        _parsingSeconds = (int) MyTimer.get(Space.TIMER_PARSING).seconds();
+        _loadingSeconds = 0;
+        _parsingSeconds = 0;
         
 		return spaces;
 	}

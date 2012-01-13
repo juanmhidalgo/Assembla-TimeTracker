@@ -2,9 +2,6 @@ package com.starredsolutions.assemblandroid.asyncTask;
 
 import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Ticket;
-import com.starredsolutions.utils.MyTimer;
-
-import android.util.Log;
 
 public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayList<Ticket>>
 {
@@ -24,7 +21,6 @@ public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArra
 	@Override
 	protected ParsedArrayList<Ticket> doInBackground(Void... params)
 	{
-		MyTimer.start(Ticket.TIMER_LOADING);
 		ParsedArrayList<Ticket> tickets;
 		try
 		{
@@ -39,10 +35,9 @@ public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArra
 			tickets    = null;
 			_count     = 0;
 		}
-      	MyTimer.stop(Ticket.TIMER_LOADING);
       	
-      	_loadingSeconds = (int) MyTimer.get(Ticket.TIMER_LOADING).seconds();
-      	_parsingSeconds = (int) MyTimer.get(Ticket.TIMER_PARSING).seconds();
+      	_loadingSeconds = 0;
+      	_parsingSeconds = 0;
         
 		return tickets;
 	}

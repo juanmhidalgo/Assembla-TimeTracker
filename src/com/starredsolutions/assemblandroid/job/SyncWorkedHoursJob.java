@@ -10,7 +10,6 @@ import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.net.RestfulException;
-import com.starredsolutions.utils.MyTimer;
 
 
 /**
@@ -39,7 +38,6 @@ public class SyncWorkedHoursJob {
 	
 	
 	public SyncWorkedHoursJob(String[] args)  {
-	    MyTimer timer = MyTimer.start("TotalTime");
 		
 	    try {
             String username = SyncWorkedHoursJobCredentials.USERNAME;
@@ -51,9 +49,6 @@ public class SyncWorkedHoursJob {
             
             syncAllSpaces();
             
-            timer.stop();
-            
-            log("\n\t => Total syncronizing time : " + timer + "\n\n");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,13 +67,9 @@ public class SyncWorkedHoursJob {
 	public void syncSpace(Space space) throws XMLParsingException, AssemblaAPIException, RestfulException {
 		log("\n\t => Syncronizing space '" + space.name() + "'\n");
 		
-		MyTimer timer = MyTimer.start("FetchingTickets");
 		ParsedArrayList<Ticket> tickets = space.reloadTickets(true, true);
-		timer.stop();
 		
 		if (tickets != null) {
-			log(String.format("\t ** Fetched %d tickets in %s\n", tickets.size(), timer) );
-			
 			for(Ticket ticket : tickets)
 				syncTicket(space.id(), ticket);
 		}
@@ -87,15 +78,11 @@ public class SyncWorkedHoursJob {
 	public void syncTicket(String spaceId, Ticket t) throws XMLParsingException, AssemblaAPIException, RestfulException {
 		log(String.format("\n\t\t ** Syncronizing ticket #%d '%s'\n", t.number(), t.name()) );
 		
-		MyTimer timer = MyTimer.start("FetchingTimeEntries");
 		ParsedArrayList<Task> tasks = t.reloadTasks();
-		timer.stop();
 		
 		float hours = 0.0f;
 		
 		if (tasks != null) {
-			log(String.format("\t\t ** Fetched %d time entries in %s\n", tasks.size(), timer) );
-			log("\t\t  * Time entries (hh:mm:ss) : ");
 			
 			for (Task task : tasks) {
 				log(task.elapsedTime() + " ");
