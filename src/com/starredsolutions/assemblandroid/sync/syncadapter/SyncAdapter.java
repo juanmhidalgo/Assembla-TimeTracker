@@ -17,6 +17,7 @@
 package com.starredsolutions.assemblandroid.sync.syncadapter;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.apache.http.ParseException;
@@ -33,6 +34,7 @@ import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
@@ -44,6 +46,8 @@ import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 import com.starredsolutions.net.RestfulException;
+import com.starredsolutions.utils.SettingsHelper;
+import com.starredsolutions.utils.Utils;
 
 /**
  * SyncAdapter implementation for syncing sample SyncAdapter contacts to the
@@ -68,17 +72,31 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         ContentProviderClient provider, SyncResult syncResult) {
         String authtoken = null;
         
+        Long lastSync = SettingsHelper.getInstance(getContext()).getLong(Constants.LAST_SYNC_KEY, 0);
+        Long nowSync = System.currentTimeMillis();
         
+        java.text.SimpleDateFormat df = new SimpleDateFormat();
+
+        /**
+         * TODO After SDK 8 use syncResult.delayUntil
+         */
+        if( (lastSync != 0) && (nowSync - lastSync) < Constants.MIN_TIME_BW_SYNC ){
+        	if(LOGV) Log.v(TAG, "Calling Assembla Sync - Too Soon [last=" + df.format(lastSync)  + ", now="+ df.format(nowSync)  + " ElapsedTime=" + ((nowSync - lastSync)/1000/60) + " min]");
+        	return;
+        }
+        
+        SettingsHelper.getInstance(getContext()).putLong(Constants.LAST_SYNC_KEY, nowSync);
          try {
-        	 if(LOGV) Log.v(TAG, "Calling Assembla sync"); 
+        	 if(LOGV) Log.v(TAG, "Calling Assembla Sync [last=" + df.format(lastSync)  + ", now="+ df.format(nowSync)  + " ElapsedTime=" + ((nowSync - lastSync)/1000/60) + " min ]"); 
              // use the account manager to request the credentials
+        	 
              authtoken =
                 mAccountManager.blockingGetAuthToken(account,
                     Constants.AUTHTOKEN_TYPE, true /* notifyAuthFailure */);
              // fetch updates from the sample service over the cloud
             try {
-				AssemblaAPIAdapter.getInstance().setCredentials(account.name, mAccountManager.getPassword(account));
-				ArrayList<Space> spaces = AssemblaAPIAdapter.getInstance().getMySpaces();
+				AssemblaAPIAdapter.getInstance(getContext()).setCredentials(account.name, mAccountManager.getPassword(account));
+				ArrayList<Space> spaces = AssemblaAPIAdapter.getInstance(getContext()).getMySpaces();
 				if(spaces != null){
 					ArrayList<Ticket> tickets = new ArrayList<Ticket>();
 					Cursor c = null;
@@ -101,10 +119,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 							cv.put(Spaces.CREATED_AT, "");	
 							provider.insert(Spaces.CONTENT_URI, cv);
 							
-							
 						}
 						
-						tickets = AssemblaAPIAdapter.getInstance().getTicketsBySpaceId(sp.getId(), false, false);
+						tickets = AssemblaAPIAdapter.getInstance(getContext()).getTicketsBySpaceId(sp.getId(), false, false);
 						if(tickets != null){
 							for(Ticket tk:tickets){
 								cv.clear();
