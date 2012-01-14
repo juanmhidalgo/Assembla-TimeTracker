@@ -38,7 +38,6 @@ public class SpaceListActivity extends ListActivity implements OnItemClickListen
         
         final ListView lv = getListView();
         lv.setTextFilterEnabled(true);
-
         lv.setOnItemClickListener( this );
         
         

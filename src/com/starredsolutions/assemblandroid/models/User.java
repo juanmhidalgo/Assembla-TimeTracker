@@ -3,6 +3,7 @@ package com.starredsolutions.assemblandroid.models;
 import java.util.ArrayList;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.net.RestfulException;
@@ -24,7 +25,7 @@ public class User {
 	 */
 	public ArrayList<Space> getMySpaces() throws XMLParsingException, AssemblaAPIException, RestfulException {
 		if (spaces == null)
-			spaces = AssemblaAPIAdapter.getInstance().getMySpaces();
+			spaces = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getMySpaces();
 		
 		return spaces;
 	}

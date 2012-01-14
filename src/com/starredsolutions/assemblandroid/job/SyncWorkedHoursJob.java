@@ -3,6 +3,7 @@ package com.starredsolutions.assemblandroid.job;
 import java.util.ArrayList;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
@@ -44,7 +45,7 @@ public class SyncWorkedHoursJob {
             String password = SyncWorkedHoursJobCredentials.PASSWORD;
 
             log("\t => Authenticating with user " + username + "\n");
-            _assemblaAdapter = AssemblaAPIAdapter.getInstance();
+            _assemblaAdapter = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext());
             _assemblaAdapter.setCredentials(username, password);
             
             syncAllSpaces();

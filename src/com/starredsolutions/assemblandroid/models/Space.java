@@ -3,6 +3,7 @@ package com.starredsolutions.assemblandroid.models;
 import java.io.Serializable;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
@@ -64,7 +65,7 @@ public class Space implements Serializable
 	public ParsedArrayList<Ticket> reloadTickets(boolean includeClosed, boolean includeOthers) 
 				throws XMLParsingException, AssemblaAPIException, RestfulException
 	{
-		tickets = AssemblaAPIAdapter.getInstance().getTicketsBySpaceId(this.id, includeClosed, includeOthers);
+		tickets = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getTicketsBySpaceId(this.id, includeClosed, includeOthers);
 		return tickets;
 	}
 	

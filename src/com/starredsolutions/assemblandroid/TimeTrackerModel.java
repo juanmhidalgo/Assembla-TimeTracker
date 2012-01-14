@@ -140,7 +140,7 @@ public class TimeTrackerModel
     
 	public ArrayList<Space> reloadSpaces() throws AssemblaAPIException, XMLParsingException, RestfulException
 	{
-		return _spaces = AssemblaAPIAdapter.getInstance().getMySpaces();
+		return _spaces = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getMySpaces();
 	}
 
 }

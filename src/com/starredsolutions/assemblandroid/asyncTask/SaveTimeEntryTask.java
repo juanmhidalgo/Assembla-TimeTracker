@@ -1,6 +1,7 @@
 package com.starredsolutions.assemblandroid.asyncTask;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
@@ -30,7 +31,7 @@ public class SaveTimeEntryTask extends AssemblaAsyncTask<Void, Void, Void>
 	{
 		//Log.i(TAG, "doInBackground");
 		try {
-			AssemblaAPIAdapter.getInstance().saveTimeEntry(_space, _ticket, _task);
+			AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).saveTimeEntry(_space, _ticket, _task);
 		} catch (Exception e) {
 			_exception = e;
 		}

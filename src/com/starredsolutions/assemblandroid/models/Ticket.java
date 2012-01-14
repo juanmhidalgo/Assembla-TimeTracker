@@ -3,6 +3,7 @@ package com.starredsolutions.assemblandroid.models;
 import java.io.Serializable;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
@@ -82,7 +83,7 @@ public class Ticket implements Serializable
 	 * @throws AssemblaAPIException 
 	 */
 	public ParsedArrayList<Task> reloadTasks() throws XMLParsingException, AssemblaAPIException, RestfulException {
-		tasks = AssemblaAPIAdapter.getInstance().getTasksBySpaceIdAndTicketNumber(this.spaceId, this.number);
+		tasks = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getTasksBySpaceIdAndTicketNumber(this.spaceId, this.number);
 		return tasks;
 	}
 	
