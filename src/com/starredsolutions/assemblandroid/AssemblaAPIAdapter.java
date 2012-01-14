@@ -12,6 +12,7 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -25,6 +26,7 @@ import com.starredsolutions.assemblandroid.models.TicketComparator;
 import com.starredsolutions.net.RequestMethod;
 import com.starredsolutions.net.RestfulClient;
 import com.starredsolutions.net.RestfulException;
+import com.starredsolutions.utils.SettingsHelper;
 
 /**
  * AssemblaAPIAdapter is responsible for communicating with the Assembla Web 
@@ -37,15 +39,17 @@ import com.starredsolutions.net.RestfulException;
  * @author david
  */
 public class AssemblaAPIAdapter {
-	static private final String TAG = "AssemblaTT";
-	private static final String LOG_TAG = AssemblaAPIAdapter.class.getSimpleName();
+	private static final String TAG = "AssemblaAPIAdapter";
+	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE);
+	private Context context = null;
 	
 	// Singleton Pattern
 	static private AssemblaAPIAdapter instance = null;
 	
-	static public AssemblaAPIAdapter getInstance() throws XMLParsingException {
-		if (instance == null)
-			instance = new AssemblaAPIAdapter();
+	static public AssemblaAPIAdapter getInstance(Context ctx) throws XMLParsingException {
+		if (instance == null){
+			instance = new AssemblaAPIAdapter(ctx);
+		}
 		return instance;
 	}
 	
@@ -74,9 +78,8 @@ public class AssemblaAPIAdapter {
 	 * SINGLETON: A private constructor enforces the Singleton pattern by preventing external instanciation.
 	 * @throws XMLParsingException 
 	 */
-	private AssemblaAPIAdapter() throws XMLParsingException {
-		
-		
+	private AssemblaAPIAdapter(Context ctx) throws XMLParsingException {
+		this.context = ctx;
 	}
 	
 	
@@ -251,26 +254,39 @@ public class AssemblaAPIAdapter {
 	 * @throws AssemblaAPIException 
 	 */
 	public String getMyUserId() throws XMLParsingException, RestfulException, AssemblaAPIException {
-		// HTTPS unsupported !?!?
 		
-		String url = "https://www.assembla.com/user/best_profile/" + username;
 		
-		String response = request(RequestMethod.GET, url);
-
-        if (client.getStatusCode() != 200) {
-			String msg = "HTTP Error while retrieving UserId. Expected status 200 OK, but got " + 
-				Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
-			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
-		}
-        
-		try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			userId = this.getNodeValueAsString(doc.selectSingleNode("/user/id"));
-			
-			return userId;
-		} catch (Exception e) {
-			throw new XMLParsingException("Error occured while parsing user profile XML", e);
+		if(!TextUtils.isEmpty(userId)){
+			if(LOGV) Log.v(TAG,"getMyUserId from instance");
+			return userId; 
+		}else{
+			if(SettingsHelper.getInstance(context).containsKey(Constants.USERID_KEY)){
+				if(LOGV) Log.v(TAG,"getMyUserId from SharedPreferences");
+				userId = SettingsHelper.getInstance(context).getString(Constants.USERID_KEY,null);
+				return userId;
+			}else{
+				if(LOGV) Log.v(TAG,"getMyUserId from Assembla");
+				String url = "https://www.assembla.com/user/best_profile/" + username;
+				
+				String response = request(RequestMethod.GET, url);
+		
+		        if (client.getStatusCode() != 200) {
+					String msg = "HTTP Error while retrieving UserId. Expected status 200 OK, but got " + 
+						Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
+					throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
+				}
+		        
+				try {
+					Document doc = reader.read( stringToInputStream(response) );
+					
+					userId = this.getNodeValueAsString(doc.selectSingleNode("/user/id"));
+					SettingsHelper.getInstance(this.context).putString(Constants.USERID_KEY, userId);
+					
+					return userId;
+				} catch (Exception e) {
+					throw new XMLParsingException("Error occured while parsing user profile XML", e);
+				}
+			}
 		}
 	}
 	
@@ -391,8 +407,6 @@ public class AssemblaAPIAdapter {
 	 */
 	public ParsedArrayList<Task> getTasksBySpaceIdAndTicketNumber(String spaceId, int number) throws RestfulException, XMLParsingException, AssemblaAPIException {
 		String url = "https://www.assembla.com/spaces/" + spaceId + "/tickets/" + Integer.toString(number);
-		
-		Log.i(LOG_TAG, "calling["+url+"]");
 		
 		String response = request(RequestMethod.GET, url);
         
@@ -515,7 +529,4 @@ public class AssemblaAPIAdapter {
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
 	}
-	
-
-	
 }
