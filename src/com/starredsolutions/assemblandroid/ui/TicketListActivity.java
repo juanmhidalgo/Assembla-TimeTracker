@@ -5,11 +5,17 @@ package com.starredsolutions.assemblandroid.ui;
 
 import android.app.ListActivity;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.adapter.TicketCursorAdapter;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
@@ -20,7 +26,9 @@ import com.starredsolutions.utils.ActivityHelper;
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
  *
  */
-public class TicketListActivity extends ListActivity{
+public class TicketListActivity extends ListActivity  implements OnItemClickListener{
+	private static final String TAG = "TicketListActivity"; 
+	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
 	protected final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
 	private Uri mUri;
 	private Cursor mCursor;
@@ -34,6 +42,7 @@ public class TicketListActivity extends ListActivity{
         
         final ListView lv = getListView();
         lv.setTextFilterEnabled(true);
+        lv.setOnItemClickListener( this );
 
         mUri = getIntent().getData();
         String space_id = getIntent().getStringExtra(Spaces.SPACE_ID);
@@ -49,5 +58,33 @@ public class TicketListActivity extends ListActivity{
         mCursor = managedQuery(Tickets.buildTicketBySpaceUri(spId), Tickets.PROJECTION, Tickets.SPACE_ID + "= ?", new String[]{space_id}, null);
         TicketCursorAdapter adapter = new TicketCursorAdapter(this, mCursor, false);
         setListAdapter(adapter);
+	}
+	
+	public void onItemClick(AdapterView<?>parent, View view, int position, long id) {
+		String space_id = null;
+		int ticket_number = 0;
+		try{
+			Cursor c =  (Cursor) parent.getItemAtPosition(position);
+			if(c != null){
+				space_id = c.getString(c.getColumnIndex(Tickets.SPACE_ID));
+				ticket_number = c.getInt(c.getColumnIndex(Tickets.NUMBER));
+			}
+		}catch(Exception e){
+			Log.e(TAG, "onItemClick", e);
+		}
+		
+		//Uri uri = ContentUris.withAppendedId(getIntent().getData(), id);
+		Uri uri = Tickets.buildTicketUri(String.valueOf(id));
+		if(LOGV) Log.v(TAG,"Uri: " + uri);
+		
+		Intent it = new Intent(Intent.ACTION_VIEW, uri);
+		if(space_id != null){
+			it.putExtra(Tickets.SPACE_ID, space_id);
+		}
+		
+		if(ticket_number != 0){
+			it.putExtra(Tickets.NUMBER, ticket_number);
+		}
+		startActivity(it);
 	}
 }

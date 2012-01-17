@@ -57,7 +57,6 @@
             android:excludeFromRecents="true"
             android:label="@string/ui_activity_title"
             android:theme="@android:style/Theme.Dialog" >
-
         </activity>
 
         <provider
@@ -77,9 +76,7 @@
         <activity android:name=".ui.SpaceListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="vnd.android.cursor.dir/vnd.assembla.space" />
             </intent-filter>
         </activity>
@@ -92,10 +89,14 @@
                 <data android:mimeType="vnd.android.cursor.item/vnd.assembla.space" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".views.LauncherActivity"
-            android:configChanges="keyboardHidden|orientation" >
+        <activity android:name=".ui.TicketDetailActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.assembla.ticket" />
+            </intent-filter>
         </activity>
+        
         <activity
             android:name=".sync.authenticator.AuthenticatorActivity"
             android:excludeFromRecents="true"
@@ -107,7 +108,6 @@
                 someone who explicitly knows the class name
             -->
         </activity>
-        
     </application>
 
 </manifest>
