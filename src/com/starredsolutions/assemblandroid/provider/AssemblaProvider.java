@@ -15,7 +15,9 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
+import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
+import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 import com.starredsolutions.assemblandroid.provider.AssemblaDatabase.Tables;
 
@@ -25,7 +27,7 @@ import com.starredsolutions.assemblandroid.provider.AssemblaDatabase.Tables;
  */
 public class AssemblaProvider extends ContentProvider{
 	private static final String TAG = "AssemblaProvider";
-	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE);
+	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
 	
 	private AssemblaDatabase mOpenHelper;
 
@@ -38,6 +40,10 @@ public class AssemblaProvider extends ContentProvider{
     private static final int TICKETS = 400;
     private static final int TICKETS_ID = 401;
     private static final int TICKETS_BY_SPACE = 402;
+    private static final int TASKS = 500;
+    private static final int TASKS_ID = 501;
+    private static final int TASKS_BY_SPACE = 502;
+    private static final int TASKS_BY_TICKET = 503;
     
     private static UriMatcher buildUriMatcher() {
     	final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -47,6 +53,12 @@ public class AssemblaProvider extends ContentProvider{
         matcher.addURI(authority, AssemblaContract.PATH_TICKETS, TICKETS);
         matcher.addURI(authority, AssemblaContract.PATH_TICKETS +"/#", TICKETS_ID);
         matcher.addURI(authority, AssemblaContract.PATH_TICKETS +"/space/#", TICKETS_BY_SPACE);
+        
+        matcher.addURI(authority, AssemblaContract.PATH_TASKS, TASKS);
+        matcher.addURI(authority, AssemblaContract.PATH_TASKS +"/#", TASKS_ID);
+        matcher.addURI(authority, AssemblaContract.PATH_TASKS +"/space/#", TASKS_BY_SPACE);
+        matcher.addURI(authority, AssemblaContract.PATH_TASKS +"/ticket/#", TASKS_BY_TICKET);
+        
         return matcher;
     }
     
@@ -71,6 +83,14 @@ public class AssemblaProvider extends ContentProvider{
 				return Tickets.CONTENT_ITEM_TYPE;
 			case TICKETS_BY_SPACE:
 				return Tickets.CONTENT_TYPE;
+			case TASKS:
+				return Tasks.CONTENT_TYPE;
+			case TASKS_ID:
+				return Tasks.CONTENT_ITEM_TYPE;
+			case TASKS_BY_SPACE:
+				return Tasks.CONTENT_TYPE;
+			case TASKS_BY_TICKET:
+				return Tasks.CONTENT_TYPE;
 
 			default:
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -90,6 +110,10 @@ public class AssemblaProvider extends ContentProvider{
         		return Spaces.CONTENT_URI;
         	case TICKETS:
         		db.insertOrThrow(Tables.TICKETS, null, values);
+        		getContext().getContentResolver().notifyChange(uri, null);
+        		return Spaces.CONTENT_URI;
+        	case TASKS:
+        		db.insertOrThrow(Tables.TASKS, null, values);
         		getContext().getContentResolver().notifyChange(uri, null);
         		return Spaces.CONTENT_URI;
         	default:
@@ -130,6 +154,12 @@ public class AssemblaProvider extends ContentProvider{
 				qb.setTables(Tables.TICKETS);
 				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
+			case TASKS:
+			case TASKS_BY_SPACE:
+			case TASKS_BY_TICKET:
+				qb.setTables(Tables.TASKS);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
+				break;
 		}
 		
 		
@@ -152,6 +182,9 @@ public class AssemblaProvider extends ContentProvider{
 	        	break;
 	        case TICKETS:
 	        	count = db.update(Tables.TICKETS, values, selection, selectionArgs);
+	        	break;
+	        case TASKS:
+	        	count = db.update(Tables.TASKS, values, selection, selectionArgs);
 	        	break;
 	        default:
 				throw new IllegalArgumentException("Unknown URI " + uri);

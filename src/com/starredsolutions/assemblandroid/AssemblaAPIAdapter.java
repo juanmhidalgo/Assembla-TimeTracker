@@ -450,6 +450,60 @@ public class AssemblaAPIAdapter {
 	}
 	
 	/**
+	 * GET https://www.assembla.com/spaces/<space-id>/tickets/<ticket-number>
+	 * curl -i -X GET -H "Accept: application/xml" https://assemblandroid:login@www.assembla.com/spaces/assemblandroid-timetracker/tickets/2
+	 * @param spaceId
+	 * @param number
+	 * @throws RestfulException 
+	 * @throws XMLParsingException 
+	 * @throws AssemblaAPIException 
+	 */
+	public ArrayList<Task> getTasks() throws RestfulException, XMLParsingException, AssemblaAPIException {
+		String url = "https://www.assembla.com/user/time_entries";
+		
+		String response = request(RequestMethod.GET, url);
+		
+		if (client.getStatusCode() != 200) {
+			String msg = "HTTP Error while retrieving Tasks. Expected status 200 OK, but got " + 
+					Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
+			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
+		}
+		
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		
+		int id, ticketId,number;
+		Date beginAt = null, endAt = null;
+		float hours;
+		String description, userId, spaceId;
+		
+		try {
+			Document doc = reader.read( stringToInputStream(response) );
+			
+			List<Node> nodes =  (List<Node>) doc.selectNodes("/tasks/task");
+			
+			for(int i=0; i<nodes.size() ; i++) {
+				Node node = nodes.get(i);
+				
+				id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
+				hours        = this.getNodeValueAsFloat(node.selectSingleNode("hours"));
+				description  = this.getNodeValueAsString(node.selectSingleNode("description"));
+				ticketId     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-id"));
+				number	     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-number"));
+				userId       = this.getNodeValueAsString(node.selectSingleNode("user-id"));
+				// overwrite the spaceId received as argument
+				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
+				
+				Task task = new Task(id, beginAt, endAt, hours, description, spaceId, ticketId, number, userId);
+				tasks.add(task);
+				
+			}
+		}catch (Exception e){
+			throw new XMLParsingException("Error while parsing Tasks XML", e);
+		}
+		return tasks;
+	}
+	
+	/**
 	 * POST https://www.assembla.com/user/time_entries
 	 * curl -i -X POST -H "Content-Type:application/xml" -H "Accept: application/xml" -d "<task><hours>0.75</hours><description>my first time entry</description><begin-at>2011-05-04 16:30 UTC</begin-at><end-at>2011-05-04 17:15 UTC</end-at><space-id>dvpLtiDOOr4lSCeJe5cbCb</space-id><ticket-id>3779344</ticket-id><description>Test Time Entry</description></task>" https://assemblandroid:login@www.assembla.com/user/time_entries
 	 * 

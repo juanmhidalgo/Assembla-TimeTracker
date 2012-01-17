@@ -66,8 +66,18 @@ public class Task implements Serializable
 	}
 	
 	
+	public int getId(){ return this.id; }
+	public int getTicketId(){ return this.ticketId; }
+	public int getTicketNumber(){ return this.ticketNumber; }
+	public String getSpaceId(){ return this.spaceId; }
+	public String getDescription(){ return this.description; }
+	public Date getBeginAt(){ return this.beginAt; }
+	public Date getEndAt(){ return this.endAt; }
+	public Date getUpdatedAt(){ return this.lastResumedAt; }
+	
 	public State state() { return this.state; }
 	public float hours() { return this.hours; }
+	public float getHours() { return this.hours; }
 	
 	public void start() {
 		this.beginAt = this.lastResumedAt = new Date();

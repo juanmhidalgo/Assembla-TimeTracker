@@ -9,7 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.SpacesColumns;
+import com.starredsolutions.assemblandroid.provider.AssemblaContract.TasksColumns;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.TicketsColumns;
 
 /**
@@ -18,14 +20,15 @@ import com.starredsolutions.assemblandroid.provider.AssemblaContract.TicketsColu
  */
 public class AssemblaDatabase extends SQLiteOpenHelper {
 	private static final String TAG = "AssemblaDatabase";
-	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE);
+	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
 
     private static final String DATABASE_NAME = "assembla.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
     
     interface Tables {
     	String SPACES = "spaces";
     	String TICKETS = "tickets";
+    	String TASKS = "tasks";
     }
     
     public AssemblaDatabase(Context context){
@@ -54,6 +57,21 @@ public class AssemblaDatabase extends SQLiteOpenHelper {
 				+ TicketsColumns.DESCRIPTION+ " TEXT NOT NULL,"
 				+ TicketsColumns.WORKING_HOURS+ " REAL NOT NULL)");
 		
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + Tables.TASKS + "( "
+				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ TasksColumns.TASK_ID + " INTEGER NOT NULL,"
+				+ TasksColumns.TICKET_ID + " INTEGER NOT NULL,"
+				+ TasksColumns.TICKET_NUMBER + " INTEGER NOT NULL,"
+				+ TasksColumns.SPACE_ID + " TEXT NOT NULL,"
+				+ TasksColumns.DESCRIPTION+ " TEXT NOT NULL,"
+				+ TasksColumns.HOURS+ " REAL NOT NULL,"
+				+ TasksColumns.USER_ID+ " INTEGER NOT NULL,"
+				+ TasksColumns.BEGIN_AT+ " DATE NOT NULL,"
+				+ TasksColumns.END_AT+ " DATE NOT NULL,"
+				+ TasksColumns.UPDATED_AT+ " DATE NOT NULL)");
+		  
+				
+		
 	}
 
 	@Override
@@ -61,6 +79,7 @@ public class AssemblaDatabase extends SQLiteOpenHelper {
 		if (LOGV) Log.v(TAG, "onUpgrade From Version: " + oldVersion + " to " + newVersion);
 		db.execSQL("DROP TABLE IF EXISTS " + Tables.TICKETS);
 		db.execSQL("DROP TABLE IF EXISTS " + Tables.SPACES);
+		db.execSQL("DROP TABLE IF EXISTS " + Tables.TASKS);
 		onCreate(db);
 	}
 }
