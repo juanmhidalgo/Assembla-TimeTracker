@@ -37,6 +37,7 @@ public class TaskCursorAdapter extends CursorAdapter implements Filterable{
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
+		((TextView) view.findViewById(R.id.taskTime)).setText(cursor.getString(cursor.getColumnIndex(Tasks.HOURS)));
 		((TextView) view.findViewById(R.id.taskDescription)).setText(cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION)));
 	}
 

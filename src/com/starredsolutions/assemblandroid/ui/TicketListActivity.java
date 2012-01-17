@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
@@ -38,12 +39,24 @@ public class TicketListActivity extends ListActivity  implements OnItemClickList
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.space_list);
-        mActivityHelper.setupActionBar(getString(R.string.tickets_title), R.color.darkdarkgray, false);
+        
+        String space_name = getIntent().getStringExtra(Spaces.NAME);
+        
+       	mActivityHelper.setupActionBar(getString(R.string.tickets_title), R.color.darkdarkgray, false);
         
         final ListView lv = getListView();
         lv.setTextFilterEnabled(true);
         lv.setOnItemClickListener( this );
-
+        
+        TextView header = new TextView(this);
+        header.setText("[Space] " + space_name);
+        header.setPadding(5, 8, 5, 8);
+        header.setBackgroundColor(R.color.darkgray);
+        header.setTextColor(R.color.white);
+        
+        lv.addHeaderView(header);
+        
+        
         mUri = getIntent().getData();
         String space_id = getIntent().getStringExtra(Spaces.SPACE_ID);
         
@@ -68,23 +81,18 @@ public class TicketListActivity extends ListActivity  implements OnItemClickList
 			if(c != null){
 				space_id = c.getString(c.getColumnIndex(Tickets.SPACE_ID));
 				ticket_number = c.getInt(c.getColumnIndex(Tickets.NUMBER));
+				
 			}
 		}catch(Exception e){
 			Log.e(TAG, "onItemClick", e);
 		}
 		
-		//Uri uri = ContentUris.withAppendedId(getIntent().getData(), id);
 		Uri uri = Tickets.buildTicketUri(String.valueOf(id));
 		if(LOGV) Log.v(TAG,"Uri: " + uri);
 		
 		Intent it = new Intent(Intent.ACTION_VIEW, uri);
-		if(space_id != null){
-			it.putExtra(Tickets.SPACE_ID, space_id);
-		}
-		
-		if(ticket_number != 0){
-			it.putExtra(Tickets.NUMBER, ticket_number);
-		}
+		it.putExtra(Tickets.SPACE_ID, space_id);
+		it.putExtra(Tickets.NUMBER, ticket_number);
 		startActivity(it);
 	}
 }

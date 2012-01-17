@@ -48,10 +48,12 @@ public class SpaceListActivity extends ListActivity implements OnItemClickListen
 
 	public void onItemClick(AdapterView<?>parent, View view, int position, long id) {
 		String space_id = null;
+		String space_name = null;
 		try{
 			Cursor c =  (Cursor) parent.getItemAtPosition(position);
 			if(c != null){
 				space_id = c.getString(c.getColumnIndex(Spaces.SPACE_ID));
+				space_name = c.getString(c.getColumnIndex(Spaces.NAME));
 			}
 		}catch(Exception e){
 			Log.e(TAG, "onItemClick", e);
@@ -59,9 +61,8 @@ public class SpaceListActivity extends ListActivity implements OnItemClickListen
 		Uri uri = ContentUris.withAppendedId(getIntent().getData(), id);
 
 		Intent it = new Intent(Intent.ACTION_VIEW, uri);
-		if(space_id != null){
-			it.putExtra(Spaces.SPACE_ID, space_id);
-		}
+		it.putExtra(Spaces.SPACE_ID, space_id);
+		it.putExtra(Spaces.NAME, space_name);
 		startActivity(it);
 		
 	}

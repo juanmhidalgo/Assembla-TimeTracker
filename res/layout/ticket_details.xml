@@ -4,35 +4,43 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-	<include layout="@layout/actionbar" />
-	
-    <TextView
-        android:id="@+id/txtName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/name" >
-    </TextView>
 
-    <TextView
-        android:id="@+id/txtStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/status" >
-    </TextView>
+    <include layout="@layout/actionbar" />
 
-    <TextView
-        android:id="@+id/txtHours"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hours" >
-    </TextView>
+        
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/txtDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/description" >
-    </TextView>
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/name" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/status" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtHours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hours" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/description" >
+        </TextView>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnStart"
@@ -44,8 +52,10 @@
 
     <ListView
         android:id="@+id/taskListView"
+        style="@style/TicketDetailTaskList"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="5dp" >
     </ListView>
 
 </LinearLayout>
