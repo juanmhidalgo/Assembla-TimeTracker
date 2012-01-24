@@ -19,11 +19,20 @@ public class SettingsHelper {
 	private SharedPreferences sp;
 	private Context context;
 	
+	/**
+	 * 
+	 * @param ctx
+	 */
 	protected SettingsHelper(final Context ctx){
 		context = ctx;
 		sp = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 	
+	/**
+	 * 
+	 * @param ctx
+	 * @return
+	 */
 	public static SettingsHelper getInstance(final Context ctx){
 		if(instance == null){
 			instance = new SettingsHelper(ctx);
@@ -31,14 +40,46 @@ public class SettingsHelper {
 		return instance;
 	}
 
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public boolean containsKey(String key){
 		return sp.contains(key);
 	}
 	
+	
+	/**
+	 * 
+	 * @param key
+	 */
+	public void deleteKey(final String key){
+		if(sp.contains(key)){
+			(new Thread(new Runnable() {
+				public void run() {
+					sp.edit().remove(key).commit();
+				}
+			})).start();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
 	public String getString(String key,String defaultValue){
 		return sp.getString(key, defaultValue);
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
 	public int getInt(String key,int defaultValue){
 		try{
 			return sp.getInt(key, defaultValue);
@@ -61,6 +102,7 @@ public class SettingsHelper {
 	 */
 	public long  getLong(String key,long defaultValue){
 		try{
+			
 			return sp.getLong(key, defaultValue);
 		}catch(ClassCastException e){
 			String val;
