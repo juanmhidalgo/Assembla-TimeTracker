@@ -1,13 +1,19 @@
 package com.starredsolutions.assemblandroid;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Application;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,8 +37,11 @@ import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Task.State;
 import com.starredsolutions.assemblandroid.models.Ticket;
+import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
+import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 import com.starredsolutions.assemblandroid.views.DialogThemedActivity;
 import com.starredsolutions.net.RestfulException;
+import com.starredsolutions.utils.SettingsHelper;
 
 
 /**
@@ -56,9 +65,9 @@ public class TimeTrackerApplication extends Application
     /*********************************************************************************************
      * CONSTANTS
      *********************************************************************************************/
-    static private final String TAG = "AssemblaTT";
+    static private final String TAG = "TimeTrackerApplication";
     static private final String SNAPSHOT_FILE = "mysnapshot.dat";
-    
+    private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
     
     
     /*********************************************************************************************
@@ -74,6 +83,8 @@ public class TimeTrackerApplication extends Application
 	
 	private boolean _starting = false;
 	
+	private boolean taskRunning = false;
+	private JSONObject currentTask = null;
 	
 	
 	/*********************************************************************************************
@@ -92,9 +103,120 @@ public class TimeTrackerApplication extends Application
 	 */
 	public TimeTrackerApplication() {
 	    _starting = true;
-	    
 		instance = this;
 	}
+	
+	/**
+	 * Created when this class is instanciated by the Android environment
+	 * 
+	 * http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
+	 */
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		if(SettingsHelper.getInstance(instance).containsKey(Constants.CURRENT_TASK_KEY)){
+			try {
+				currentTask = new JSONObject(SettingsHelper.getInstance(instance).getString(Constants.CURRENT_TASK_KEY, null));
+				this.taskRunning = true;
+			} catch (JSONException e) {
+				if(LOGV) Log.e(TAG, "onCreate", e);
+			}
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param _id
+	 * @param space_id
+	 * @param ticket_number
+	 * @return
+	 */
+	public boolean startTicketTask(long _id,String space_id, int ticket_id, int ticket_number,String description){
+		if(this.taskRunning){
+			//TODO throw exception
+		}
+		try {
+			currentTask = new JSONObject();
+			currentTask.put(Tickets._ID, _id);
+			currentTask.put(Tickets.SPACE_ID, space_id);
+			currentTask.put(Tickets.NUMBER, ticket_number);
+			currentTask.put(Tickets.TICKET_ID, ticket_id);
+			currentTask.put(Tickets.DESCRIPTION, description);
+			currentTask.put(Tasks.BEGIN_AT + "_n", System.nanoTime());
+			currentTask.put(Tasks.BEGIN_AT, Calendar.getInstance().getTimeInMillis() );
+			
+			SettingsHelper.getInstance(instance).putString(Constants.CURRENT_TASK_KEY, currentTask.toString());
+			this.taskRunning = true;
+			return true;
+		} catch (JSONException e) {
+			if(LOGV) Log.e(TAG, "startTicketTask", e);
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public void stopTicketTask() {
+		if(!this.taskRunning || (currentTask == null) ){
+			//TODO throw exception
+		}
+		(new Thread(new Runnable() {
+			
+			public void run() {
+				try {
+					long beginAt = currentTask.getLong(Tasks.BEGIN_AT +"_n");
+					long endAt = System.nanoTime();
+					float hours = ( (endAt - beginAt) / 1000000000.0f) / 3600f;
+					
+					currentTask.put(Tasks.END_AT, Calendar.getInstance().getTimeInMillis());
+					
+					Task tk = AssemblaAPIAdapter.getInstance(instance).saveTicketTask(currentTask.getString(Tickets.SPACE_ID), 
+							currentTask.getInt(Tickets.TICKET_ID), hours,new Date(currentTask.getLong(Tasks.BEGIN_AT)), 
+							new Date(currentTask.getLong(Tasks.END_AT)),currentTask.getString(Tickets.DESCRIPTION));
+					
+					taskRunning = false;
+					currentTask = null;
+					SettingsHelper.getInstance(instance).deleteKey(Constants.CURRENT_TASK_KEY);
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US);
+					
+					ContentValues cv = new ContentValues();
+					cv.put(Tasks.TASK_ID,tk.getId());
+					cv.put(Tasks.TICKET_ID,tk.getTicketId());
+					cv.put(Tasks.TICKET_NUMBER,tk.getTicketNumber());
+					cv.put(Tasks.SPACE_ID,tk.getSpaceId());
+					cv.put(Tasks.DESCRIPTION,tk.getDescription());
+					cv.put(Tasks.HOURS,tk.getHours());
+					cv.put(Tasks.USER_ID,tk.getUserId());
+					if(tk.beginAt() != null){
+						cv.put(Tasks.BEGIN_AT,sdf.format(tk.beginAt()));
+						cv.put(Tasks.END_AT,sdf.format(tk.endAt()));
+						cv.put(Tasks.UPDATED_AT,sdf.format(tk.endAt()));
+					}
+					getContentResolver().insert(Tasks.CONTENT_URI, cv);
+					
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AssemblaAPIException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (XMLParsingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (RestfulException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		})).start();
+	}
+	
+	
 	
 	/**
 	 * Manages a non-fatal Exception
@@ -161,49 +283,7 @@ public class TimeTrackerApplication extends Application
 	}
 	
 	
-	/**
-	 * Created when this class is instanciated by the Android environment
-	 * 
-	 * http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
-	 */
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		/*
-		_starting = true;
-		Log.i(TAG, "TimeTrackingApplication starting... ");
-		
-		try {
-			_assemblaAdapter = AssemblaAPIAdapter.getInstance();
-
-		} catch (XMLParsingException e) {
-			// FATAL Exception
-			manageException(e);
-			return;
-		}
-		
-		// Load preferences
-		this._preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		
-		reloadPreferences();
-
-        _snapshotManager = new SnapshotManager(this);
-        restoreState();
-        _starting = false;*/
-	}
 	
-	public void reloadPreferences()
-	{
-		String username  = this._preferences.getString("username", "");
-		String password  = this._preferences.getString("password", "");
-		
-		//Log.i(TAG, "TimeTrackingManager.setPreferences() user=" + username + "; pass=" + password);
-		try {
-			_assemblaAdapter.setCredentials(username, password);
-		} catch (Exception e) {
-			manageException(e);
-		}
-	}
 	
 	public ArrayList<Space> getSpaces(){
 		return _model.spaces();
@@ -263,6 +343,9 @@ public class TimeTrackerApplication extends Application
         
 		return _model.curTask();
 	}
+	
+	
+	
 	
 	public Task curTask() {
 		return _model.curTask();

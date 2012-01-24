@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
@@ -48,14 +47,6 @@ public class TicketListActivity extends ListActivity  implements OnItemClickList
         lv.setTextFilterEnabled(true);
         lv.setOnItemClickListener( this );
         
-        TextView header = new TextView(this);
-        header.setText("[Space] " + space_name);
-        header.setPadding(5, 8, 5, 8);
-        header.setBackgroundColor(R.color.darkgray);
-        header.setTextColor(R.color.white);
-        
-        lv.addHeaderView(header);
-        
         
         mUri = getIntent().getData();
         String space_id = getIntent().getStringExtra(Spaces.SPACE_ID);
@@ -74,14 +65,18 @@ public class TicketListActivity extends ListActivity  implements OnItemClickList
 	}
 	
 	public void onItemClick(AdapterView<?>parent, View view, int position, long id) {
+		
 		String space_id = null;
+		String ticket_description = null;
 		int ticket_number = 0;
+		int ticket_id = 0;
 		try{
 			Cursor c =  (Cursor) parent.getItemAtPosition(position);
 			if(c != null){
 				space_id = c.getString(c.getColumnIndex(Tickets.SPACE_ID));
 				ticket_number = c.getInt(c.getColumnIndex(Tickets.NUMBER));
-				
+				ticket_id = c.getInt(c.getColumnIndex(Tickets.TICKET_ID));
+				ticket_description = c.getString(c.getColumnIndex(Tickets.DESCRIPTION));
 			}
 		}catch(Exception e){
 			Log.e(TAG, "onItemClick", e);
@@ -93,6 +88,9 @@ public class TicketListActivity extends ListActivity  implements OnItemClickList
 		Intent it = new Intent(Intent.ACTION_VIEW, uri);
 		it.putExtra(Tickets.SPACE_ID, space_id);
 		it.putExtra(Tickets.NUMBER, ticket_number);
+		it.putExtra(Tickets.TICKET_ID, ticket_id);
+		it.putExtra(Tickets.DESCRIPTION, ticket_description);
+
 		startActivity(it);
 	}
 }

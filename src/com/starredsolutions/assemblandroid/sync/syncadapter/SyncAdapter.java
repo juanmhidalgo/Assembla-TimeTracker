@@ -19,6 +19,7 @@ package com.starredsolutions.assemblandroid.sync.syncadapter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.apache.http.ParseException;
 
@@ -34,6 +35,7 @@ import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
@@ -112,6 +114,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 						if(c != null && c.moveToFirst()){
 							if (LOGV) Log.v(TAG, "Space From DB: " + sp.name());
+							//TODO Update Space
 							c.close();
 						}else{
 							if(c != null){
@@ -128,6 +131,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 						this.syncTickets(sp);
 					}
 					this.syncTasks();
+					System.gc();
 				}
 				
 			} catch (XMLParsingException e) {
@@ -179,6 +183,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 				c = mProvider.query(Tickets.CONTENT_URI, new String[]{Tickets._ID}, Tickets.NUMBER + " = ?", new String[]{ String.valueOf(tk.getNumber())},null);
 				if(c != null && c.moveToFirst()){
 					if(LOGV) Log.v(TAG,"Ticket From DB - Space: " + sp.getName() + " Number: "  + tk.getNumber() );
+					//TODO Update Ticket
 					c.close();
 				}else{
 					if(c != null){
@@ -208,14 +213,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private void syncTasks() throws XMLParsingException, AssemblaAPIException, RestfulException, RemoteException{
     	ArrayList<Task> tasks = AssemblaAPIAdapter.getInstance(getContext()).getTasks();
+    	DateUtils dt = new DateUtils();
+    	
     	if(tasks != null){
     		Cursor c = null;
     		ContentValues cv = new ContentValues();
+    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US);
+    		
     		for(Task tk: tasks){
     			cv.clear();
     			c = mProvider.query(Tasks.CONTENT_URI, new String[]{Tasks._ID}, Tasks.TASK_ID + "= ?", new String[]{String.valueOf(tk.getId())}, null);
     			if((c != null) && c.moveToFirst() ){
     				if(LOGV) Log.v(TAG,"Task From DB "  + tk.description() );
+    				//TODO Update Task
     				c.close();
     			}else{
     				if(c!= null){
@@ -228,13 +238,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 					cv.put(Tasks.DESCRIPTION,tk.getDescription());
 					cv.put(Tasks.HOURS,tk.getHours());
 					cv.put(Tasks.USER_ID,tk.getUserId());
-					//FIXME Obtener las fechas en formato texto
-					cv.put(Tasks.BEGIN_AT,"2012-01-01");
-					//cv.put(Tasks.BEGIN_AT,tk.getBeginAt().toLocaleString());
-					//cv.put(Tasks.END_AT,tk.getEndAt().toLocaleString());
-					cv.put(Tasks.END_AT,"2012-01-01");
-					//cv.put(Tasks.UPDATED_AT,tk.getUpdatedAt().toLocaleString());
-					cv.put(Tasks.UPDATED_AT,"2012-01-01");
+					if(tk.beginAt() != null){
+						cv.put(Tasks.BEGIN_AT,sdf.format(tk.beginAt()));
+						cv.put(Tasks.END_AT,sdf.format(tk.endAt()));
+						cv.put(Tasks.UPDATED_AT,sdf.format(tk.endAt()));
+					}
 					mProvider.insert(Tasks.CONTENT_URI, cv);
     			}
     		}

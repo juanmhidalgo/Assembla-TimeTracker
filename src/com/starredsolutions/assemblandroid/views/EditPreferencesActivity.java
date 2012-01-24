@@ -1,12 +1,11 @@
 package com.starredsolutions.assemblandroid.views;
 
-import com.starredsolutions.assemblandroid.R;
-import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.UIController;
-
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.starredsolutions.assemblandroid.R;
+import com.starredsolutions.assemblandroid.UIController;
 
 public class EditPreferencesActivity extends PreferenceActivity
 {
@@ -25,7 +24,6 @@ public class EditPreferencesActivity extends PreferenceActivity
     	super.onDestroy();
     	UIController.getInstance().onActivityDestroyed( this );
     	
-        TimeTrackerApplication.getInstance().reloadPreferences();
 	}
     
     /**

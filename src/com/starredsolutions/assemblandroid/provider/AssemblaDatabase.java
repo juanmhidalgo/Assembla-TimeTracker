@@ -23,7 +23,7 @@ public class AssemblaDatabase extends SQLiteOpenHelper {
 	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
 
     private static final String DATABASE_NAME = "assembla.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     
     interface Tables {
     	String SPACES = "spaces";
@@ -66,9 +66,9 @@ public class AssemblaDatabase extends SQLiteOpenHelper {
 				+ TasksColumns.DESCRIPTION+ " TEXT NOT NULL,"
 				+ TasksColumns.HOURS+ " REAL NOT NULL,"
 				+ TasksColumns.USER_ID+ " INTEGER NOT NULL,"
-				+ TasksColumns.BEGIN_AT+ " DATE NOT NULL,"
-				+ TasksColumns.END_AT+ " DATE NOT NULL,"
-				+ TasksColumns.UPDATED_AT+ " DATE NOT NULL)");
+				+ TasksColumns.BEGIN_AT+ " DATE DEFAULT NULL,"
+				+ TasksColumns.END_AT+ " DATE DEFAULT  NULL,"
+				+ TasksColumns.UPDATED_AT+ " DATE DEFAULT NULL)");
 		  
 				
 		

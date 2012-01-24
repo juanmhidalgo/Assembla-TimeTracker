@@ -46,8 +46,13 @@
         android:id="@+id/btnStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onStartClicked"
         android:text="@string/start" >
+    </Button>
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stop" >
     </Button>
 
     <ListView

@@ -451,7 +451,7 @@ public class AssemblaAPIAdapter {
 	
 	/**
 	 * GET https://www.assembla.com/spaces/<space-id>/tickets/<ticket-number>
-	 * curl -i -X GET -H "Accept: application/xml" https://assemblandroid:login@www.assembla.com/spaces/assemblandroid-timetracker/tickets/2
+	 * curl -i -X GET -H "Accept: application/xml" https://assemblandroid:login@www.assembla.com/user/time_entries
 	 * @param spaceId
 	 * @param number
 	 * @throws RestfulException 
@@ -501,6 +501,52 @@ public class AssemblaAPIAdapter {
 			throw new XMLParsingException("Error while parsing Tasks XML", e);
 		}
 		return tasks;
+	}
+	
+	public Task saveTicketTask(String space_id,int ticket_id,float hours,Date beginAt,Date endAt,String description)throws AssemblaAPIException, RestfulException, XMLParsingException{
+		String url = "https://www.assembla.com/user/time_entries";
+		
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+			"<task>" + 
+			"	<hours>" + Float.toString(hours) + "</hours>" + 
+			"	<description>"+ description+"</description>" + 
+			"	<begin-at>" + beginAt + "</begin-at>" + 
+			"	<end-at>" + endAt + "</end-at>" +   			// 2011-05-04 17:15 UTC 
+			"	<space-id>" + space_id + "</space-id>" + 
+			"	<ticket-id>" + ticket_id + "</ticket-id>" + 
+			"</task>";
+		
+		String response = request(RequestMethod.POST, url, xml);
+		
+		if (client.getStatusCode() != 201) {
+			String msg = "HTTP Error while saving TimeEntry. Expected status 201 Created, but got " + 
+				Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
+			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
+		}
+		int id, ticketId,number;
+		
+		float tmpHours;
+		String tmpDescription, userId, spaceId;
+		try {
+			Document doc = reader.read( stringToInputStream(response) );
+			
+			Node node = doc.selectSingleNode("/task");
+			id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
+			tmpHours     = this.getNodeValueAsFloat(node.selectSingleNode("hours"));
+			tmpDescription  = this.getNodeValueAsString(node.selectSingleNode("description"));
+			ticketId     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-id"));
+			number	     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-number"));
+			userId       = this.getNodeValueAsString(node.selectSingleNode("user-id"));
+			// overwrite the spaceId received as argument
+			spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
+			
+			Task task = new Task(id, beginAt, endAt, tmpHours, tmpDescription, spaceId, ticketId, number, userId);
+			return task;
+			
+		} catch (Exception e) {
+			throw new XMLParsingException("Error occured while parsing user profile XML", e);
+		}
+		
 	}
 	
 	/**
