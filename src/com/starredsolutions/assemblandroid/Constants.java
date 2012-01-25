@@ -27,10 +27,10 @@ public class Constants {
     
     public static final long MIN_TIME_BW_SYNC = 5 * 60 *1000; //15 min
     
-    /*
-    public static boolean SUPPORTS_GINGERBREAD = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD;
-    public static boolean SUPPORTS_HONEYCOMB = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB;
-    public static boolean SUPPORTS_FROYO = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO;*/
+    
+    public static boolean SUPPORTS_GINGERBREAD = false; //android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD;
+    public static boolean SUPPORTS_HONEYCOMB = false; // android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB;
+    public static boolean SUPPORTS_FROYO = false; //android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO;
     public static boolean SUPPORTS_ECLAIR = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ECLAIR;
     
 }
