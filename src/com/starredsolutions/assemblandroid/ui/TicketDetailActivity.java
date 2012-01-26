@@ -18,6 +18,7 @@ import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.adapter.TaskCursorAdapter;
+import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 import com.starredsolutions.utils.ActivityHelper;
@@ -44,30 +45,46 @@ public class TicketDetailActivity extends Activity {
 		final String description = getIntent().getStringExtra(Tickets.DESCRIPTION);
 		final int ticket_number = getIntent().getIntExtra(Tickets.NUMBER,0); 
 		final long _id = ContentUris.parseId(getIntent().getData());
-		final int ticket_id = getIntent().getIntExtra(Tickets.TICKET_ID,0); 
+		final int ticket_id = getIntent().getIntExtra(Tickets.TICKET_ID,0);
+		
+		
 		
 		final ListView lv = (ListView) findViewById(R.id.taskListView);
 		if(lv != null){
+			//FIXME Change managedQuery for CursorLoader
 			mCursor = managedQuery(Tasks.CONTENT_URI, Tasks.PROJECTION, Tasks.SPACE_ID + "= ? AND " + Tasks.TICKET_NUMBER + " = ?", new String[]{space_id, String.valueOf(ticket_number)}, null);
 			TaskCursorAdapter adapter = new TaskCursorAdapter(this, mCursor, false);
 			lv.setAdapter(adapter);
 		}
 		
-		//TODO Show only stop button on current ticket
-		Button btnStart = (Button) findViewById(R.id.btnStart);
+		final Button btnStart = (Button) findViewById(R.id.btnStart);
+		final Button btnStop = (Button) findViewById(R.id.btnStop);
+		
+		TimeTrackerApplication _app = (TimeTrackerApplication) getApplicationContext();
+		Task currentTask = _app.getCurrentTask();
+		if(currentTask!=null){
+			btnStart.setVisibility(View.GONE);
+			if(currentTask.getSpaceId().equals(space_id) && currentTask.getTicketNumber() == ticket_number){
+				btnStop.setVisibility(View.VISIBLE);
+			}
+		}
+		
+		
 		btnStart.setOnClickListener(new OnClickListener() {
-			
 			public void onClick(View v) {
 				if(LOGV) Log.v(TAG,"Start Ticket [ space_id=" + space_id + ", ticket_id=" +  String.valueOf(ticket_id)+ ", ticket_number=" +  String.valueOf(ticket_number)+"]" );
 				TimeTrackerApplication.getInstance().startTicketTask(_id, space_id, ticket_id, ticket_number,description);
+				v.setVisibility(View.GONE);
+				btnStop.setVisibility(View.VISIBLE);
 				
 			}
 		});
-		Button btnStop = (Button) findViewById(R.id.btnStop);
 		btnStop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if(LOGV) Log.v(TAG,"Stop Ticket [ space_id=" + space_id + ", ticket_id=" +  String.valueOf(ticket_id)+ ", ticket_number=" +  String.valueOf(ticket_number)+"]" );
 				TimeTrackerApplication.getInstance().stopTicketTask();
+				v.setVisibility(View.GONE);
+				btnStart.setVisibility(View.VISIBLE);
 			}
 		});
 	}

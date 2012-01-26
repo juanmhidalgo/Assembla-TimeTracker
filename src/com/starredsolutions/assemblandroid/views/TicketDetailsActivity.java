@@ -171,7 +171,7 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
             {
                 HashMap<String,String> hash = new HashMap<String,String>();
                 hash.put("A", t.elapsedHours()+"h");
-                hash.put("B", t.description());
+                hash.put("B", t.getDescription());
                 items.add(hash);
             }
         }

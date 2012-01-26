@@ -73,10 +73,10 @@ public class TimeEntryActivity extends BaseActivity implements IAsynctaskObserve
         txtView = (TextView) layout.findViewById(R.id.txtTicketDescription);
         txtView.setText( "Description: \n" + ticket.description() );
         txtView = (TextView) layout.findViewById(R.id.txtStartedAt);
-        txtView.setText( "Started at: " + task.beginAt().toString() );
+        txtView.setText( "Started at: " + task.getBeginAt().toString() );
         
         _btnPauseResume = (Button) layout.findViewById(R.id.btnPauseResume);
-        _btnPauseResume.setText(  (task.state()==State.STARTED) ? "Pause" : "Resume");
+        _btnPauseResume.setText(  (task.getState()==State.STARTED) ? "Pause" : "Resume");
         
         _txtElapsedTime = (TextView) layout.findViewById(R.id.txtElapsedTime);
         _editLogMessage = (EditText) layout.findViewById(R.id.editLogMessage);

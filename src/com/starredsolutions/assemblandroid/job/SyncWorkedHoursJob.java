@@ -87,7 +87,7 @@ public class SyncWorkedHoursJob {
 			
 			for (Task task : tasks) {
 				log(task.elapsedTime() + " ");
-				hours += task.hours();
+				hours += task.getHours();
 			}
 		}
 		log(String.format("\n\t\t ** Total Tasks time (%.4f) vs Actual Ticket time (%.4f)\n", hours, t.workedHours() ));

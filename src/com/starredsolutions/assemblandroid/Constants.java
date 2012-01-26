@@ -23,6 +23,7 @@ public class Constants {
     public static final String USERID_KEY ="USER_ID";
     public static final String LAST_SYNC_KEY ="LAST_SYNC";
     public static final String CURRENT_TASK_KEY ="CURRENT_TASK";
+    public static final String CURRENT_TASK_FNAME ="CURRENT_TASK";
     
     
     public static final long MIN_TIME_BW_SYNC = 5 * 60 *1000; //15 min

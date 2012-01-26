@@ -2,14 +2,11 @@ package com.starredsolutions.assemblandroid;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Application;
@@ -41,7 +38,7 @@ import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 import com.starredsolutions.assemblandroid.views.DialogThemedActivity;
 import com.starredsolutions.net.RestfulException;
-import com.starredsolutions.utils.SettingsHelper;
+import com.starredsolutions.utils.LocalPersistenceHelper;
 
 
 /**
@@ -81,10 +78,12 @@ public class TimeTrackerApplication extends Application
 
 	private SharedPreferences _preferences;
 	
+	private String username;
+	private String password;
+	
 	private boolean _starting = false;
 	
-	private boolean taskRunning = false;
-	private JSONObject currentTask = null;
+	private Task currentTask = null;
 	
 	
 	/*********************************************************************************************
@@ -114,13 +113,13 @@ public class TimeTrackerApplication extends Application
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if(SettingsHelper.getInstance(instance).containsKey(Constants.CURRENT_TASK_KEY)){
-			try {
-				currentTask = new JSONObject(SettingsHelper.getInstance(instance).getString(Constants.CURRENT_TASK_KEY, null));
-				this.taskRunning = true;
-			} catch (JSONException e) {
-				if(LOGV) Log.e(TAG, "onCreate", e);
-			}
+		currentTask = (Task) LocalPersistenceHelper.readObjectFromFile(instance, Constants.CURRENT_TASK_FNAME);
+		AccountManager mAccountManager = AccountManager.get(instance);
+		
+		Account ac[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+		if(ac.length > 0){
+			username = ac[0].name;
+			password = mAccountManager.getPassword(ac[0]);
 		}
 	}
 	
@@ -133,26 +132,17 @@ public class TimeTrackerApplication extends Application
 	 * @return
 	 */
 	public boolean startTicketTask(long _id,String space_id, int ticket_id, int ticket_number,String description){
-		if(this.taskRunning){
+		if(this.currentTask != null && this.currentTask.isStarted()){
 			//TODO throw exception
 		}
-		try {
-			currentTask = new JSONObject();
-			currentTask.put(Tickets._ID, _id);
-			currentTask.put(Tickets.SPACE_ID, space_id);
-			currentTask.put(Tickets.NUMBER, ticket_number);
-			currentTask.put(Tickets.TICKET_ID, ticket_id);
-			currentTask.put(Tickets.DESCRIPTION, description);
-			currentTask.put(Tasks.BEGIN_AT + "_n", System.nanoTime());
-			currentTask.put(Tasks.BEGIN_AT, Calendar.getInstance().getTimeInMillis() );
-			
-			SettingsHelper.getInstance(instance).putString(Constants.CURRENT_TASK_KEY, currentTask.toString());
-			this.taskRunning = true;
-			return true;
-		} catch (JSONException e) {
-			if(LOGV) Log.e(TAG, "startTicketTask", e);
-			return false;
-		}
+		currentTask = new Task(space_id,ticket_id);
+		currentTask.set_id(_id);
+		currentTask.setTicketNumber(ticket_number);
+		currentTask.setDescription(description);
+		currentTask.start();
+
+		LocalPersistenceHelper.witeObjectToFile(instance, currentTask, Constants.CURRENT_TASK_FNAME);
+		return true;
 	}
 	
 	/**
@@ -160,27 +150,23 @@ public class TimeTrackerApplication extends Application
 	 * @return
 	 */
 	public void stopTicketTask() {
-		if(!this.taskRunning || (currentTask == null) ){
+		if((currentTask == null) || !currentTask.isStarted()){
 			//TODO throw exception
 		}
 		(new Thread(new Runnable() {
 			
 			public void run() {
 				try {
-					long beginAt = currentTask.getLong(Tasks.BEGIN_AT +"_n");
-					long endAt = System.nanoTime();
-					float hours = ( (endAt - beginAt) / 1000000000.0f) / 3600f;
 					
-					currentTask.put(Tasks.END_AT, Calendar.getInstance().getTimeInMillis());
+					currentTask.stop();
+					AssemblaAPIAdapter.getInstance(instance).setCredentials(username, password);
+					Task tk = AssemblaAPIAdapter.getInstance(instance)
+							.saveTicketTask(currentTask.getSpaceId(), currentTask.getTicketId(), currentTask.getHours(), 
+											currentTask.getBeginAt(), currentTask.getEndAt(), currentTask.getDescription());
 					
-					Task tk = AssemblaAPIAdapter.getInstance(instance).saveTicketTask(currentTask.getString(Tickets.SPACE_ID), 
-							currentTask.getInt(Tickets.TICKET_ID), hours,new Date(currentTask.getLong(Tasks.BEGIN_AT)), 
-							new Date(currentTask.getLong(Tasks.END_AT)),currentTask.getString(Tickets.DESCRIPTION));
 					
-					taskRunning = false;
-					currentTask = null;
-					SettingsHelper.getInstance(instance).deleteKey(Constants.CURRENT_TASK_KEY);
 					
+					LocalPersistenceHelper.deleteObjectFile(instance, Constants.CURRENT_TASK_FNAME);
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US);
 					
 					ContentValues cv = new ContentValues();
@@ -191,16 +177,14 @@ public class TimeTrackerApplication extends Application
 					cv.put(Tasks.DESCRIPTION,tk.getDescription());
 					cv.put(Tasks.HOURS,tk.getHours());
 					cv.put(Tasks.USER_ID,tk.getUserId());
-					if(tk.beginAt() != null){
-						cv.put(Tasks.BEGIN_AT,sdf.format(tk.beginAt()));
-						cv.put(Tasks.END_AT,sdf.format(tk.endAt()));
-						cv.put(Tasks.UPDATED_AT,sdf.format(tk.endAt()));
+					if(tk.getBeginAt() != null){
+						cv.put(Tasks.BEGIN_AT,sdf.format(tk.getBeginAt()));
+						cv.put(Tasks.END_AT,sdf.format(tk.getEndAt()));
+						cv.put(Tasks.UPDATED_AT,sdf.format(tk.getEndAt()));
 					}
 					getContentResolver().insert(Tasks.CONTENT_URI, cv);
 					
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					currentTask = null;
 				} catch (AssemblaAPIException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -211,9 +195,16 @@ public class TimeTrackerApplication extends Application
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 			}
 		})).start();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Task getCurrentTask(){
+		return currentTask;
 	}
 	
 	
@@ -355,14 +346,14 @@ public class TimeTrackerApplication extends Application
 	 * @return current paused state (true = paused)
 	 */
 	public State togglePauseTimeEntry() {
-		switch (_model.curTask().state()) {
+		switch (_model.curTask().getState()) {
 			case STARTED: _model.curTask().pause(); break;
 			case STOPPED: _model.curTask().resume(); break;
 			case PAUSED:  _model.curTask().resume(); break;
 		}
         saveState();
-        
-		return _model.curTask().state();
+
+		return _model.curTask().getState();
 	}
 	
 	public void stopTimeEntry() {

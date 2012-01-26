@@ -224,7 +224,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     			cv.clear();
     			c = mProvider.query(Tasks.CONTENT_URI, new String[]{Tasks._ID}, Tasks.TASK_ID + "= ?", new String[]{String.valueOf(tk.getId())}, null);
     			if((c != null) && c.moveToFirst() ){
-    				if(LOGV) Log.v(TAG,"Task From DB "  + tk.description() );
+    				if(LOGV) Log.v(TAG,"Task From DB "  + tk.getDescription() );
     				//TODO Update Task
     				c.close();
     			}else{
@@ -238,10 +238,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 					cv.put(Tasks.DESCRIPTION,tk.getDescription());
 					cv.put(Tasks.HOURS,tk.getHours());
 					cv.put(Tasks.USER_ID,tk.getUserId());
-					if(tk.beginAt() != null){
-						cv.put(Tasks.BEGIN_AT,sdf.format(tk.beginAt()));
-						cv.put(Tasks.END_AT,sdf.format(tk.endAt()));
-						cv.put(Tasks.UPDATED_AT,sdf.format(tk.endAt()));
+					if(tk.getBeginAt() != null){
+						cv.put(Tasks.BEGIN_AT,sdf.format(tk.getBeginAt()));
+						cv.put(Tasks.END_AT,sdf.format(tk.getEndAt()));
+						cv.put(Tasks.UPDATED_AT,sdf.format(tk.getEndAt()));
 					}
 					mProvider.insert(Tasks.CONTENT_URI, cv);
     			}

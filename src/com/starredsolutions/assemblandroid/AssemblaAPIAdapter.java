@@ -568,9 +568,9 @@ public class AssemblaAPIAdapter {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
 			"<task>" + 
 			"	<hours>" + Float.toString(task.elapsedHours()) + "</hours>" + 
-			"	<description>" + TextUtils.htmlEncode(task.description()) + "</description>" + 
-			"	<begin-at>" + task.beginAt() + "</begin-at>" + 
-			"	<end-at>" + task.endAt() + "</end-at>" +   			// 2011-05-04 17:15 UTC 
+			"	<description>" + TextUtils.htmlEncode(task.getDescription()) + "</description>" + 
+			"	<begin-at>" + task.getBeginAt() + "</begin-at>" + 
+			"	<end-at>" + task.getEndAt() + "</end-at>" +   			// 2011-05-04 17:15 UTC 
 			"	<space-id>" + space.id() + "</space-id>" + 
 			"	<ticket-id>" + ticket.id() + "</ticket-id>" + 
 			"</task>";
@@ -591,7 +591,7 @@ public class AssemblaAPIAdapter {
 			+ "  <status>" + Integer.toString(ticket.status()) + "</status>"
 			+ "  <custom-fields>"
 			+ "    <workedhours>" + Float.toString(ticket.workedHours()) + "</workedhours>"
-			+ "    <lastlogmessage>" + TextUtils.htmlEncode(task.description()) + "</lastlogmessage>"
+			+ "    <lastlogmessage>" + TextUtils.htmlEncode(task.getDescription()) + "</lastlogmessage>"
 			+ "  </custom-fields>"
 			+ "</ticket>";
 		
