@@ -22,7 +22,6 @@ import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -33,7 +32,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -42,46 +40,19 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.text.format.DateUtils;
 import android.util.Log;
-
-import com.starredsolutions.assemblandroid.Constants;
-import com.starredsolutions.utils.base.INetClient;
-import com.starredsolutions.utils.base.INetClient.NetClientException;
-import com.starredsolutions.utils.base.INetClient.OnGetUrlCompleteListener;
-import com.starredsolutions.utils.base.INetClient.RequestMethod;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
  *
  */
-public class LegacyNetClient implements INetClient {
-	private static final String TAG = "LegacyNetClient";
-	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
-	
+public class LegacyNetClient extends NetClient {
 	private  HttpClient mClient;
-	private Context mContext;
-	private OnGetUrlCompleteListener mOnComplete = null;
-	private ArrayList<NameValuePair> mHeaders = null;
-	private ArrayList<NameValuePair> mParams = null;
 	
-	private RequestMethod mMethod;
-	private String mUrl = null;
-	private UsernamePasswordCredentials credentials;
-	
-	private static final int SECOND_IN_MILLIS = (int) DateUtils.SECOND_IN_MILLIS;
 	private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
     private static final String ENCODING_GZIP = "gzip";
     private static final int HTTP_STATUS_OK = 200;
     
-    /**
-     * Shared buffer used by {@link #getUrlContent(String)} when reading results
-     * from an API request.
-     */
-    private static byte[] sBuffer = new byte[512];
     
 
     /**
@@ -89,73 +60,17 @@ public class LegacyNetClient implements INetClient {
      * @param context
      */
     public LegacyNetClient(Context context){
-    	mContext = context;
+    	super(context);
     	newRequest(null, null, null, null,null);
     }
     
     
-    
-	/* (non-Javadoc)
-	 * @see com.tangelo.proverbio.utils.base.INetClient#newRequest(com.tangelo.proverbio.utils.base.INetClient.RequestMethod, java.lang.String, java.util.ArrayList, java.util.ArrayList)
-	 */
-	public void newRequest(RequestMethod method, String url,
-			ArrayList<NameValuePair> params, ArrayList<NameValuePair> headers) {
-		
+	@Override
+	public void newRequest(RequestMethod method, String url,ArrayList<NameValuePair> params, ArrayList<NameValuePair> headers) {
+		super.newRequest(method, url, params, headers);
 		mClient = getHttpClient(mContext);
-		mMethod = method;
-		mUrl = url;
-		mParams = params;
-		mHeaders = headers;
-		mOnComplete = null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tangelo.proverbio.utils.base.INetClient#newRequest(com.tangelo.proverbio.utils.base.INetClient.RequestMethod, java.lang.String, java.util.ArrayList, java.util.ArrayList, com.tangelo.proverbio.utils.base.INetClient.OnGetUrlCompleteListener)
-	 */
-	public void newRequest(RequestMethod method, String url,
-			ArrayList<NameValuePair> params, ArrayList<NameValuePair> headers,
-			OnGetUrlCompleteListener onComplete) {
-		newRequest(method, url, params, headers);
-		mOnComplete = onComplete;
-	}
-	
-	/**
-	 * Execute a request after newRequest
-	 */
-	public String execute() throws NetClientException {
-		if(mUrl == null){
-			throw new NetClientException("Url is empty");
-		}
-		if(mOnComplete != null){
-			getUrlContent(mMethod, mUrl, mParams, mHeaders, mOnComplete);
-			return null;
-		}else{
-			return getUrlContent(mMethod, mUrl, mParams, mHeaders);
-		}
-	}
-	
-
-	/* (non-Javadoc)
-	 * @see com.tangelo.proverbio.utils.base.INetClient#addParam(java.lang.String, java.lang.String)
-	 */
-	public void addParam(String name, String value) {
-		if(this.mParams == null){
-			this.mParams = new ArrayList<NameValuePair>();
-		}
-		this.mParams.add(new BasicNameValuePair(name,value));
-	}
-
-	/* (non-Javadoc)
-	 * @see com.tangelo.proverbio.utils.base.INetClient#addHeader(java.lang.String, java.lang.String)
-	 */
-	public void addHeader(String name, String value) {
-		if(this.mHeaders == null){
-			this.mHeaders = new ArrayList<NameValuePair>();
-		}
-		this.mHeaders.add(new BasicNameValuePair(name,value));
-
-	}
-	
 	
 	
 	private synchronized GetUrlResponse getRawUrlContent(RequestMethod method, String url,
@@ -200,9 +115,6 @@ public class LegacyNetClient implements INetClient {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tangelo.proverbio.utils.base.INetClient#getUrlContent(com.tangelo.proverbio.utils.base.INetClient.RequestMethod, java.lang.String, java.util.ArrayList, java.util.ArrayList)
-	 */
 	public String getUrlContent(RequestMethod method, String url,
 			ArrayList<NameValuePair> params, ArrayList<NameValuePair> headers)
 				throws NetClientException {
@@ -212,14 +124,12 @@ public class LegacyNetClient implements INetClient {
 		return response.mResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tangelo.proverbio.utils.base.INetClient#getUrlContent(com.tangelo.proverbio.utils.base.INetClient.RequestMethod, java.lang.String, java.util.ArrayList, java.util.ArrayList, com.tangelo.proverbio.utils.base.INetClient.OnGetUrlCompleteListener)
-	 */
 	public void getUrlContent(final RequestMethod method, final String url,
 			final ArrayList<NameValuePair> params, final ArrayList<NameValuePair> headers,
 			final OnGetUrlCompleteListener onComplete){
 		
 		(new Thread(new Runnable() {
+			
 			public void run() {
 				try {
 					GetUrlResponse response;
@@ -235,26 +145,9 @@ public class LegacyNetClient implements INetClient {
 				}
 			}
 		})).start();
-
-		
 	}
 
-	/**
-     * Build and return a user-agent string that can identify this application
-     * to remote servers. Contains the package name and version code.
-     */
-    private String buildUserAgent() {
-        try {
-            final PackageManager manager = mContext.getPackageManager();
-            final PackageInfo info = manager.getPackageInfo(mContext.getPackageName(), 0);
 
-            // Some APIs require "(gzip)" in the user-agent string.
-            return info.packageName + "/" + info.versionName
-                    + " (" + info.versionCode + ") (gzip)";
-        } catch (NameNotFoundException e) {
-            return null;
-        }
-    }
     
     /**
      * Simple {@link HttpEntityWrapper} that inflates the wrapped
@@ -386,12 +279,6 @@ public class LegacyNetClient implements INetClient {
     	return request;
     }
 
-
-
-	public void addHttpBasicAuthCredentials(String user, String pass) {
-		credentials = new UsernamePasswordCredentials(user, pass);
-	}
-	
 	
 	private class GetUrlResponse{
 		public String mResponse;
