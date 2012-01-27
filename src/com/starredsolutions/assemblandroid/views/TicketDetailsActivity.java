@@ -71,7 +71,7 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
         _txtHours = (TextView) layout.findViewById(R.id.txtHours);
         _txtDescription = (TextView) layout.findViewById(R.id.txtDescription);
         
-        _listView = (ListView)findViewById(R.id.taskListView);
+        //_listView = (ListView)findViewById(R.id.taskListView);
         
         mActivityHelper.setupActionBar(getString(R.string.tickets_detail_title) , 0, true);
         

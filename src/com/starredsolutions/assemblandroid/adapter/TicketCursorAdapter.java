@@ -3,8 +3,6 @@
  */
 package com.starredsolutions.assemblandroid.adapter;
 
-import java.util.ArrayList;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -16,7 +14,6 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.starredsolutions.assemblandroid.R;
-import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 
 /**
@@ -24,20 +21,18 @@ import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
  *
  */
 public class TicketCursorAdapter extends CursorAdapter implements Filterable{
-	protected ArrayList<Ticket> items;
 	protected Context ctx;
-	/*
-	private int[] colors = new int[] {
-			//0x30FF0000, 0x300000FF 
-				0xffcc0000,  // Red
-				0xffcc8a00,  // orange
-				0xFFcccc00,  // jaune
-				0xff00cc00,  // vert,
-				0xff0000cc	 // bleu
-			};
-	
-	*/
-	
+
+	/**
+	 * 
+	 * @param context
+	 * @param c
+	 * @param flags
+	 */
+	public TicketCursorAdapter(Context context, Cursor c, int flags) {
+		super(context,c,flags);
+		mContent = context.getContentResolver();
+	}
 	
 	/**
 	 * 
@@ -50,33 +45,7 @@ public class TicketCursorAdapter extends CursorAdapter implements Filterable{
 		mContent = context.getContentResolver();
 	}
 	
-	
-	/*@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		ViewHolder holder;
-		if (convertView == null) {
-			LayoutInflater vi = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = vi.inflate(R.layout.ticket_list_item, null);
-			holder = new ViewHolder();
-			holder.name = (TextView) convertView.findViewById(R.id.ticket_name);
-			holder.hours= (TextView) convertView.findViewById(R.id.ticket_hours);
-			convertView.setTag(holder);
 
-		}else{
-			holder = (ViewHolder) convertView.getTag();
-		}
-		
-		Ticket tk= items.get(position);
-		if(tk != null){
-			holder.name.setText(tk.getName());
-			holder.hours.setText(String.format("%s / %s", tk.workedHoursHuman(), tk.workingHoursHuman()));
-			holder.name.setTextColor(this.colors[tk.getPriority()-1]);
-			holder.hours.setTextColor(this.colors[tk.getPriority()-1]);
-			
-		}
-		return convertView;
-	}*/
-	
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {

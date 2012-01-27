@@ -4,4 +4,6 @@
 	<item type="id" name="actionbar_compat_container" />
 	<item type="id" name="actionbar_compat_logo" />
 	<item type="id" name="actionbar_compat_text" />    
+	
+	<item type="id" name="details" />    
 </resources>

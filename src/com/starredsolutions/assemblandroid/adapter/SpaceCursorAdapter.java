@@ -34,6 +34,18 @@ public class SpaceCursorAdapter extends CursorAdapter implements Filterable{
 	}
 	
 
+	/**
+	 * 
+	 * @param context
+	 * @param c
+	 * @param flags
+	 */
+	public SpaceCursorAdapter(Context context, Cursor c, int flags) {
+		super(context,c,flags);
+		mContent = context.getContentResolver();
+	}
+
+
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		((TextView) view.findViewById(R.id.space_name)).setText(cursor.getString(1));

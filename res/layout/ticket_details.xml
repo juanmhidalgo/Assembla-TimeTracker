@@ -55,12 +55,11 @@
         android:text="@string/stop" android:visibility="gone">
     </Button>
 
-    <ListView
-        android:id="@+id/taskListView"
-        style="@style/TicketDetailTaskList"
+    <fragment
+        android:id="@+id/fragment_task_list"
+        android:name="com.starredsolutions.assemblandroid.ui.fragments.TaskListFragment"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginLeft="5dp" >
-    </ListView>
+        android:layout_height="0dip"
+        android:layout_weight="1" />
 
 </LinearLayout>

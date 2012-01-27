@@ -23,6 +23,17 @@ import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
  */
 public class TaskCursorAdapter extends CursorAdapter implements Filterable{
 	
+
+	/**
+	 * 
+	 * @param context
+	 * @param c
+	 * @param flags
+	 */
+	public TaskCursorAdapter(Context context, Cursor c, int flags) {
+		super(context,c,flags);
+		mContent = context.getContentResolver();
+	}
 	/**
 	 * 
 	 * @param context

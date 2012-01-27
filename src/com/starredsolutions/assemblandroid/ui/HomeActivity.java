@@ -5,19 +5,15 @@ package com.starredsolutions.assemblandroid.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract;
-import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.sync.authenticator.AuthenticatorActivity;
 import com.starredsolutions.utils.ActivityHelper;
 
@@ -25,7 +21,7 @@ import com.starredsolutions.utils.ActivityHelper;
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
  *
  */
-public class HomeActivity extends Activity{
+public class HomeActivity extends FragmentActivity{
 	static private final String TAG = "HomeActivity";
 	static private final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE);
 	protected final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
@@ -51,17 +47,10 @@ public class HomeActivity extends Activity{
 			}
 		}
         
+		
+		
         setContentView(R.layout.home_activity);
         mActivityHelper.setupActionBar(getString(R.string.app_name), R.color.darkdarkgray, false);
         
-        
-        Button btnSpaceList = (Button) findViewById(R.id.btnSpaceList);
-        btnSpaceList.setOnClickListener(new OnClickListener() {
-			
-			public void onClick(View v) {
-				startActivity(new Intent(Intent.ACTION_VIEW, Spaces.CONTENT_URI));
-				
-			}
-		});
 	}
 }

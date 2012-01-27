@@ -6,24 +6,11 @@
 
     <include layout="@layout/actionbar" />
 
-    <ListView
-        android:id="@+id/android:list"
+    <fragment
+        android:id="@+id/fragment_space_list"
+        android:name="com.starredsolutions.assemblandroid.ui.fragments.SpaceListFragment"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:divider="@color/darkdarkgray"
-        android:dividerHeight="1dp"
-        android:smoothScrollbar="true" />
-
-    <TextView
-        android:id="@+id/android:empty"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:clickable="false"
-        android:paddingBottom="10dip"
-        android:paddingLeft="10dip"
-        android:paddingTop="10dip"
-        android:text=""
-        android:textColor="@color/black" />
+        android:layout_height="0dip"
+        android:layout_weight="1" />
 
 </LinearLayout>

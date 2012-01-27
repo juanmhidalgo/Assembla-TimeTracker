@@ -3,12 +3,20 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+
     <include layout="@layout/actionbar" />
-    
-    <Button android:id="@+id/btnSpaceList"
-        android:layout_width="200dp"
-        android:layout_height="70dp"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/spaces_title"/>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" >
+
+        <fragment
+            android:id="@+id/fragment_dashboard"
+            android:name="com.starredsolutions.assemblandroid.ui.fragments.DashboardFragment"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </FrameLayout>
 
 </LinearLayout>
