@@ -42,11 +42,9 @@ public class HomeActivity extends ActionBarActivity{
 				ContentResolver.requestSync(ac[0], AssemblaContract.CONTENT_AUTHORITY, new Bundle());
 			}*/
 		}
-        
 		
 		
         setContentView(R.layout.home_activity);
         setTitle(R.string.app_name);
-        
 	}
 }
