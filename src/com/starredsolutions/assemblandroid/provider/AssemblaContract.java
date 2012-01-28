@@ -70,13 +70,16 @@ public class AssemblaContract {
 		public static final String CONTENT_TYPE ="vnd.android.cursor.dir/vnd.assembla.ticket";
 		public static final String CONTENT_ITEM_TYPE ="vnd.android.cursor.item/vnd.assembla.ticket";
 		
-		/** Build {@link Uri} for requested {@link #ARTICLE_ID}. */
 		public static Uri buildTicketUri(String ticketId){
 			return CONTENT_URI.buildUpon().appendPath(ticketId).build();
 		}
 		
 		public static Uri buildTicketBySpaceUri(long spaceId){
 			return CONTENT_URI.buildUpon().appendPath("space").appendPath(String.valueOf(spaceId)).build();
+		}
+		
+		public static Uri buildTicketBySpaceAndNumberUri(String spaceId,int number){
+			return CONTENT_URI.buildUpon().appendPath("number").appendPath(spaceId).appendPath(String.valueOf(number)).build();
 		}
 	}
 	

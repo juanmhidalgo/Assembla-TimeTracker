@@ -4,6 +4,7 @@
 package com.starredsolutions.assemblandroid.provider;
 
 import java.util.Arrays;
+import java.util.List;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -13,6 +14,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.starredsolutions.assemblandroid.Constants;
@@ -20,6 +22,7 @@ import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 import com.starredsolutions.assemblandroid.provider.AssemblaDatabase.Tables;
+import com.starredsolutions.utils.Utils;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -40,6 +43,8 @@ public class AssemblaProvider extends ContentProvider{
     private static final int TICKETS = 400;
     private static final int TICKETS_ID = 401;
     private static final int TICKETS_BY_SPACE = 402;
+    private static final int TICKETS_BY_SPACE_AND_NUMBER = 403;
+    
     private static final int TASKS = 500;
     private static final int TASKS_ID = 501;
     private static final int TASKS_BY_SPACE = 502;
@@ -53,6 +58,7 @@ public class AssemblaProvider extends ContentProvider{
         matcher.addURI(authority, AssemblaContract.PATH_TICKETS, TICKETS);
         matcher.addURI(authority, AssemblaContract.PATH_TICKETS +"/#", TICKETS_ID);
         matcher.addURI(authority, AssemblaContract.PATH_TICKETS +"/space/#", TICKETS_BY_SPACE);
+        matcher.addURI(authority, AssemblaContract.PATH_TICKETS +"/number/*/#", TICKETS_BY_SPACE_AND_NUMBER);
         
         matcher.addURI(authority, AssemblaContract.PATH_TASKS, TASKS);
         matcher.addURI(authority, AssemblaContract.PATH_TASKS +"/#", TASKS_ID);
@@ -83,6 +89,8 @@ public class AssemblaProvider extends ContentProvider{
 				return Tickets.CONTENT_ITEM_TYPE;
 			case TICKETS_BY_SPACE:
 				return Tickets.CONTENT_TYPE;
+			case TICKETS_BY_SPACE_AND_NUMBER:
+				return Tickets.CONTENT_ITEM_TYPE;
 			case TASKS:
 				return Tasks.CONTENT_TYPE;
 			case TASKS_ID:
@@ -154,6 +162,10 @@ public class AssemblaProvider extends ContentProvider{
 				qb.setTables(Tables.TICKETS);
 				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
+			case TICKETS_BY_SPACE_AND_NUMBER:
+				qb.setTables(Tables.TICKETS);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
+				break;
 			case TASKS:
 			case TASKS_BY_SPACE:
 			case TASKS_BY_TICKET:
@@ -181,6 +193,21 @@ public class AssemblaProvider extends ContentProvider{
 	        	count = db.update(Tables.SPACES, values, selection, selectionArgs);
 	        	break;
 	        case TICKETS:
+	        	count = db.update(Tables.TICKETS, values, selection, selectionArgs);
+	        	break;
+	        case TICKETS_BY_SPACE_AND_NUMBER:
+	        	List<String> pathSegments = uri.getPathSegments();
+	        	String spaceId = pathSegments.get(2);
+	        	String ticketNumber = pathSegments.get(3);
+	        	
+	        	if(!TextUtils.isEmpty(selection)){
+	        		selection += " AND " + Tickets.SPACE_ID + " =? AND " + Tickets.NUMBER + "=? ";
+	        		selectionArgs = Utils.addStringToArray(selectionArgs, spaceId);
+	        		selectionArgs = Utils.addStringToArray(selectionArgs, ticketNumber);
+	        	}else{
+	        		selection = Tickets.SPACE_ID + " =? AND " + Tickets.NUMBER + "=? ";
+	        		selectionArgs = new String[]{spaceId,ticketNumber};
+	        	}
 	        	count = db.update(Tables.TICKETS, values, selection, selectionArgs);
 	        	break;
 	        case TASKS:
