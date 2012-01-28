@@ -40,6 +40,7 @@ import android.util.Log;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
 import com.starredsolutions.assemblandroid.Constants;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.models.Space;
@@ -86,10 +87,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         /**
          * TODO After SDK 8 use syncResult.delayUntil
          */
-        if( (lastSync != 0) && (nowSync - lastSync) < Constants.MIN_TIME_BW_SYNC ){
-        	if(LOGV) Log.v(TAG, "Calling Assembla Sync - Too Soon [last=" + df.format(lastSync)  + ", now="+ df.format(nowSync)  + " ElapsedTime=" + ((nowSync - lastSync)/1000/60) + " min]");
-        	return;
+        	if( (lastSync != 0) && (nowSync - lastSync) < Constants.MIN_TIME_BW_SYNC_MILLI ){
+        		if(LOGV) Log.v(TAG, "Calling Assembla Sync - Too Soon [last=" + df.format(lastSync)  + ", now="+ df.format(nowSync)  + " ElapsedTime=" + ((nowSync - lastSync)/1000/60) + " min]");
+        		return;
+        	}
+    	if(!Constants.SUPPORTS_FROYO){
+        }else{
+        	//syncResult.delayUntil = Constants.MIN_TIME_BW_SYNC;
+        	//return;
         }
+        
         
         mProvider = provider;
         
@@ -212,8 +219,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @throws RemoteException
      */
     private void syncTasks() throws XMLParsingException, AssemblaAPIException, RestfulException, RemoteException{
+    	
     	ArrayList<Task> tasks = AssemblaAPIAdapter.getInstance(getContext()).getTasks();
-    	DateUtils dt = new DateUtils();
     	
     	if(tasks != null){
     		Cursor c = null;

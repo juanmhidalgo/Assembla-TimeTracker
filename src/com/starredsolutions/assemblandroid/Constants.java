@@ -26,7 +26,8 @@ public class Constants {
     public static final String CURRENT_TASK_FNAME ="CURRENT_TASK";
     
     
-    public static final long MIN_TIME_BW_SYNC = 15 * 60 *1000; //15 min
+    public static final long MIN_TIME_BW_SYNC_MILLI = 15 * 60 *1000; //15 min
+    public static final long MIN_TIME_BW_SYNC = 15 * 60; //15 min
     
     
     public static boolean SUPPORTS_GINGERBREAD = false; //android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD;

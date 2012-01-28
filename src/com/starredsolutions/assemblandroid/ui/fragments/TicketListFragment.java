@@ -11,13 +11,21 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
 import com.starredsolutions.assemblandroid.R;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.adapter.TicketCursorAdapter;
+import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
+import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
+import com.starredsolutions.assemblandroid.ui.ActionBarActivity;
+import com.starredsolutions.net.RestfulException;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -40,7 +48,7 @@ public class TicketListFragment extends ListFragment implements
         //setEmptyText(getString(R.string.no_quotes));
         
         // We haven't a menu item to show in action bar.
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
         
      // Create an empty adapter we will use to display the loaded data.
         mAdapter = new TicketCursorAdapter(getActivity(), null, 0);
@@ -154,5 +162,54 @@ public class TicketListFragment extends ListFragment implements
         // longer using it.
         mAdapter.swapCursor(null);
 	}
+	
+	@Override
+    public void onCreateOptionsMenu(Menu menu,MenuInflater menuInflater) {
+        
+        menuInflater.inflate(R.menu.main, menu);
+
+        // Calling super after populating the menu is necessary here to ensure that the
+        // action bar helpers have a chance to handle this event.
+        super.onCreateOptionsMenu(menu,menuInflater);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+	        case R.id.menu_refresh:
+	        	final ActionBarActivity activity = ((ActionBarActivity) getActivity());
+	        	activity.getActionBarHelper().setRefreshActionItemState(true);
+
+				(new Thread(new Runnable() {
+					public void run() {
+						
+				        TimeTrackerApplication _app = (TimeTrackerApplication) getActivity().getApplicationContext();
+				        try {
+				        	
+							_app.syncTicketsForSpace(mSpaceId,true);
+						} catch (XMLParsingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (AssemblaAPIException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (RestfulException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+				        activity.getWindow().getDecorView().post(new Runnable() {
+				        	public void run() {
+				        		activity.getActionBarHelper().setRefreshActionItemState(false);
+				        	}
+				        });
+					}
+				})).start();
+	        	break;
+	      
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }

@@ -9,6 +9,9 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
@@ -17,6 +20,7 @@ import com.starredsolutions.assemblandroid.adapter.TaskCursorAdapter;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
+import com.starredsolutions.assemblandroid.ui.ActionBarActivity;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -37,7 +41,7 @@ public class TaskListFragment extends ListFragment implements
         //setEmptyText(getString(R.string.no_quotes));
         
         // We haven't a menu item to show in action bar.
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
         
      // Create an empty adapter we will use to display the loaded data.
         mAdapter = new TaskCursorAdapter(getActivity(), null, 0);
@@ -103,5 +107,6 @@ public class TaskListFragment extends ListFragment implements
         // longer using it.
         mAdapter.swapCursor(null);
 	}
+	
 
 }
