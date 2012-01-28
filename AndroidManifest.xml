@@ -28,7 +28,7 @@
         android:debuggable="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AssemblaTimeTracker" >
+        android:theme="@style/ThemeHolo" >
         <service
             android:name=".sync.authenticator.AuthenticationService"
             android:exported="false" >

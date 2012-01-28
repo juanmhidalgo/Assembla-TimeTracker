@@ -3,20 +3,19 @@ package com.starredsolutions.assemblandroid.views;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.starredsolutions.assemblandroid.R;
-import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.UIController;
-import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
-import com.starredsolutions.assemblandroid.models.Task;
-import com.starredsolutions.assemblandroid.models.Ticket;
-import com.starredsolutions.utils.ActivityHelper;
-
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.starredsolutions.assemblandroid.R;
+import com.starredsolutions.assemblandroid.TimeTrackerApplication;
+import com.starredsolutions.assemblandroid.UIController;
+import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
+import com.starredsolutions.assemblandroid.models.Task;
+import com.starredsolutions.assemblandroid.models.Ticket;
 
 
 public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObserver
@@ -48,7 +47,6 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
     protected String getLogTag() { return TAG; }
     
     
-    final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
     
     /*********************************************************************************************
      * ACTIVITY WORKFLOW METHODS
@@ -73,7 +71,6 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
         
         //_listView = (ListView)findViewById(R.id.taskListView);
         
-        mActivityHelper.setupActionBar(getString(R.string.tickets_detail_title) , 0, true);
         
         loadTasks(false);
     }

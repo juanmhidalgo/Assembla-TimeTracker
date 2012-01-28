@@ -18,7 +18,6 @@ import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.UIController;
 import com.starredsolutions.assemblandroid.adapter.TicketCursorAdapter;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
-import com.starredsolutions.utils.ActivityHelper;
 
 
 public class TicketListingActivity extends ListActivity implements IAsynctaskObserver
@@ -45,7 +44,6 @@ public class TicketListingActivity extends ListActivity implements IAsynctaskObs
     protected String getLogTag() { return TAG; }
     
     
-    final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
     private static TicketCursorAdapter adapter;
     /*********************************************************************************************
      * ACTIVITY WORKFLOW METHODS
@@ -57,7 +55,6 @@ public class TicketListingActivity extends ListActivity implements IAsynctaskObs
         _app = TimeTrackerApplication.getInstance();
         
         setContentView(R.layout.ticket_list);
-        mActivityHelper.setupActionBar(getString(R.string.tickets_title) , 0, true);
         
         /*adapter = new TicketCursorAdapter(this, R.layout.ticket_list_item, _app.ticketsForList());
         adapter.setNotifyOnChange(true);

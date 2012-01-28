@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_search">Search</string>
+    
     <string name="label">Assembla TimeTracker</string>
     
     <string name="login_activity_username_label">Username</string>

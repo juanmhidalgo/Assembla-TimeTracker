@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+	<color name="actionbar_title_color">#333333</color>
+	    
     <color name="actionbar_text">#000000</color>
     
     <color name="white">#FFFFFF</color>

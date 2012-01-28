@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<item type="id" name="actionbar_compat" />
-	<item type="id" name="actionbar_compat_container" />
-	<item type="id" name="actionbar_compat_logo" />
-	<item type="id" name="actionbar_compat_text" />    
+    <item name="actionbar_compat" type="id"/>
+    <item name="actionbar_compat_title" type="id"/>
+    <item name="actionbar_compat_item_refresh_progress" type="id"/>
+    <item name="actionbar_compat_item_refresh" type="id"/>
+    <item name="menu_refresh" type="id"/>
 	
 	<item type="id" name="details" />    
 </resources>

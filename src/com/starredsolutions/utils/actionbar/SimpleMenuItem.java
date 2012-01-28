@@ -1,11 +1,11 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package com.starredsolutions.utils;
+package com.starredsolutions.utils.actionbar;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.view.ActionProvider;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 
 /**
- * A <em>really</em> dumb implementation of the {@link MenuItem} interface, that's only useful for
- * our old-actionbar purposes. See <code>com.android.internal.view.menu.MenuItemImpl</code> in
- * AOSP for a more complete implementation.
+ * A <em>really</em> dumb implementation of the {@link android.view.MenuItem} interface, that's only
+ * useful for our com.tangelo.proverbio.utils.actionbar-compat purposes. See
+ * <code>com.android.internal.view.menu.MenuItemImpl</code> in AOSP for a more complete
+ * implementation.
  */
 public class SimpleMenuItem implements MenuItem {
 
@@ -77,7 +79,7 @@ public class SimpleMenuItem implements MenuItem {
         return mTitleCondensed != null ? mTitleCondensed : mTitle;
     }
 
-   public MenuItem setIcon(Drawable icon) {
+    public MenuItem setIcon(Drawable icon) {
         mIconResId = 0;
         mIconDrawable = icon;
         return this;
@@ -113,11 +115,43 @@ public class SimpleMenuItem implements MenuItem {
     // No-op operations. We use no-ops to allow inflation from menu XML.
 
     public int getGroupId() {
+        // Noop
         return 0;
     }
 
     public View getActionView() {
+        // Noop
         return null;
+    }
+
+    public MenuItem setActionProvider(ActionProvider actionProvider) {
+        // Noop
+        return this;
+    }
+
+    public ActionProvider getActionProvider() {
+        // Noop
+        return null;
+    }
+
+    public boolean expandActionView() {
+        // Noop
+        return false;
+    }
+
+    public boolean collapseActionView() {
+        // Noop
+        return false;
+    }
+
+    public boolean isActionViewExpanded() {
+        // Noop
+        return false;
+    }
+
+    public MenuItem setOnActionExpandListener(OnActionExpandListener onActionExpandListener) {
+        // Noop
+        return this;
     }
 
     public MenuItem setIntent(Intent intent) {
@@ -126,6 +160,7 @@ public class SimpleMenuItem implements MenuItem {
     }
 
     public Intent getIntent() {
+        // Noop
         return null;
     }
 
@@ -140,6 +175,7 @@ public class SimpleMenuItem implements MenuItem {
     }
 
     public char getNumericShortcut() {
+        // Noop
         return 0;
     }
 
@@ -149,6 +185,7 @@ public class SimpleMenuItem implements MenuItem {
     }
 
     public char getAlphabeticShortcut() {
+        // Noop
         return 0;
     }
 
@@ -158,6 +195,7 @@ public class SimpleMenuItem implements MenuItem {
     }
 
     public boolean isCheckable() {
+        // Noop
         return false;
     }
 
@@ -167,6 +205,7 @@ public class SimpleMenuItem implements MenuItem {
     }
 
     public boolean isChecked() {
+        // Noop
         return false;
     }
 
@@ -176,29 +215,37 @@ public class SimpleMenuItem implements MenuItem {
     }
 
     public boolean isVisible() {
+        // Noop
         return true;
     }
 
     public boolean hasSubMenu() {
+        // Noop
         return false;
     }
 
     public SubMenu getSubMenu() {
+        // Noop
         return null;
     }
 
-    public MenuItem setOnMenuItemClickListener(
-            OnMenuItemClickListener onMenuItemClickListener) {
+    public MenuItem setOnMenuItemClickListener(OnMenuItemClickListener onMenuItemClickListener) {
         // Noop
         return this;
     }
 
     public ContextMenu.ContextMenuInfo getMenuInfo() {
+        // Noop
         return null;
     }
 
     public void setShowAsAction(int i) {
         // Noop
+    }
+
+    public MenuItem setShowAsActionFlags(int i) {
+        // Noop
+        return null;
     }
 
     public MenuItem setActionView(View view) {
@@ -210,5 +257,4 @@ public class SimpleMenuItem implements MenuItem {
         // Noop
         return this;
     }
-
 }

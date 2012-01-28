@@ -20,7 +20,6 @@ import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.UIController;
 import com.starredsolutions.assemblandroid.adapter.SpaceCursorAdapter;
 import com.starredsolutions.assemblandroid.asyncTask.IAsynctaskObserver;
-import com.starredsolutions.utils.ActivityHelper;
 
 
 public class ProjectsListingActivity extends ListActivity implements IAsynctaskObserver{
@@ -35,7 +34,6 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
     private TimeTrackerApplication _app;
 	private ProgressDialog _loadingDialog;
 	
-	final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
 	private static SpaceCursorAdapter adapter;
 	
 	
@@ -51,7 +49,6 @@ public class ProjectsListingActivity extends ListActivity implements IAsynctaskO
         _app = TimeTrackerApplication.getInstance();
 
         setContentView(R.layout.project_list);
-        mActivityHelper.setupActionBar(getString(R.string.projects_title) , 0, false);
         
         
         

@@ -5,7 +5,6 @@ package com.starredsolutions.assemblandroid.ui;
 
 import android.content.ContentUris;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,23 +15,21 @@ import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
-import com.starredsolutions.utils.ActivityHelper;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
  * TODO Separate in tabs
  */
-public class TicketDetailActivity extends FragmentActivity {
+public class TicketDetailActivity extends ActionBarActivity{
 	private static final String TAG = "TicketDetailActivity"; 
 	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
-	protected final ActivityHelper mActivityHelper = ActivityHelper.createInstance(this);
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.ticket_details);
-        mActivityHelper.setupActionBar(getString(R.string.tickets_detail_title), R.color.darkdarkgray, false);
+        setTitle(R.string.tickets_detail_title);
         
         final Button btnStart = (Button) findViewById(R.id.btnStart);
 		final Button btnStop = (Button) findViewById(R.id.btnStop);
