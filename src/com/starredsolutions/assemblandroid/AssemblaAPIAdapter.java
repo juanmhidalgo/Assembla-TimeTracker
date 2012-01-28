@@ -40,7 +40,7 @@ import com.starredsolutions.utils.SettingsHelper;
  */
 public class AssemblaAPIAdapter {
 	private static final String TAG = "AssemblaAPIAdapter";
-	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE);
+	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
 	private Context context = null;
 	
 	// Singleton Pattern
