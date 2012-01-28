@@ -12,8 +12,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
 
@@ -525,6 +528,24 @@ public class Utils {
     
     public static float microdegreeToFloat(int microDegree){
     	return microDegree / 1000000F;
+    }
+    
+    
+    /**
+     * 
+     * @param array
+     * @param value
+     * @return
+     */
+    public static String[] addStringToArray(String[] array,String value){
+    	if(array != null){
+	    	List<String> list = new ArrayList<String>();
+	    	Collections.addAll(list, array);
+	    	list.add(value);
+	    	return list.toArray(new String[0]);
+    	}else{
+    		return new String[]{value};
+    	}
     }
     
     	
