@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
+import com.starredsolutions.assemblandroid.asyncTask.List;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.net.RestfulException;
 
 
-public class Ticket implements Serializable
+public class Ticket implements Serializable,Cloneable
 {
     // http://stackoverflow.com/questions/285793/why-should-i-bother-about-serialversionuid
     private static final long serialVersionUID = -7491130002781226286L;
@@ -40,7 +40,7 @@ public class Ticket implements Serializable
 	private float workedHours  = 0.0f;    // Actual worked hours
 	private String lastLogMessage = null;
 	
-	private transient ParsedArrayList<Task> tasks = null;
+	private transient List<Task> tasks = null;
 	
 	
 	public String longFormattedName() {
@@ -72,7 +72,11 @@ public class Ticket implements Serializable
 		this.lastLogMessage = lastLogMessage;
 	}
 	
-	public ParsedArrayList<Task> getTasks() {
+	public Ticket() {
+		
+	}
+
+	public List<Task> getTasks() {
 		return tasks;
 	}
 	
@@ -82,8 +86,8 @@ public class Ticket implements Serializable
 	 * @throws RestfulException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ParsedArrayList<Task> reloadTasks() throws XMLParsingException, AssemblaAPIException, RestfulException {
-		tasks = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getTasksBySpaceIdAndTicketNumber(this.spaceId, this.number);
+	public List<Task> reloadTasks() throws XMLParsingException, AssemblaAPIException, RestfulException {
+		//tasks = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getTasksBySpaceIdAndTicketNumber(this.spaceId, this.number);
 		return tasks;
 	}
 	
@@ -153,6 +157,16 @@ public class Ticket implements Serializable
 	public void setWorkedHours(float hours) {
 		this.workedHours = hours;
 	}
+	/**
+	 * 
+	 */
+	public Ticket clone(){
+		try{
+			return (Ticket) super.clone();
+		}catch ( CloneNotSupportedException e ){
+			return null;
+		}
+	}
 	
 	public String toString() {
 		return "[Ticket] id = " + Integer.toString(id) + 
@@ -165,5 +179,89 @@ public class Ticket implements Serializable
 	public boolean tasksLoaded()
 	{
 		return tasks != null;
+	}
+
+	/**
+	 * @return the spaceId
+	 */
+	public String getSpaceId() {
+		return spaceId;
+	}
+
+	/**
+	 * @param spaceId the spaceId to set
+	 */
+	public void setSpaceId(String spaceId) {
+		this.spaceId = spaceId;
+	}
+
+	/**
+	 * @return the summary
+	 */
+	public String getSummary() {
+		return summary;
+	}
+
+	/**
+	 * @param summary the summary to set
+	 */
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public int getStatus() {
+		return status;
+	}
+
+	/**
+	 * @return the workedHours
+	 */
+	public float getWorkedHours() {
+		return workedHours;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param priority the priority to set
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	/**
+	 * @param number the number to set
+	 */
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
+	/**
+	 * @param statusName the statusName to set
+	 */
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @param workingHours the workingHours to set
+	 */
+	public void setWorkingHours(float workingHours) {
+		this.workingHours = workingHours;
 	}
 }

@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
+import com.starredsolutions.assemblandroid.asyncTask.List;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.net.RestfulException;
 
 
-public class Space implements Serializable
+public class Space implements Serializable,Cloneable
 {
     // http://stackoverflow.com/questions/285793/why-should-i-bother-about-serialversionuid
 	private static final long serialVersionUID = 6656872344467459407L;
@@ -34,7 +34,7 @@ public class Space implements Serializable
 //    private int watcherPermissions = -1;
 //    private String wikiName = null;
 	
-    private ParsedArrayList<Ticket> tickets = null;
+    private List<Ticket> tickets = null;
 	
 	public String id() { return this.id; }
 	public String getId() { return this.id; }
@@ -42,6 +42,9 @@ public class Space implements Serializable
 	public String listItemText() { return this.name; }
 	
 	
+	public Space() {
+		
+	}
 	public Space(String id, String name, String description) {
 		this.id = id;
 		this.name = name;
@@ -57,15 +60,15 @@ public class Space implements Serializable
 	 * @throws RestfulException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ParsedArrayList<Ticket> getTickets() {
+	public List<Ticket> getTickets() {
 		return tickets;
 	}
 	
 	
-	public ParsedArrayList<Ticket> reloadTickets(boolean includeClosed, boolean includeOthers) 
+	public List<Ticket> reloadTickets(boolean includeClosed, boolean includeOthers) 
 				throws XMLParsingException, AssemblaAPIException, RestfulException
 	{
-		tickets = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getTicketsBySpaceId(this.id, includeClosed, includeOthers);
+	//	tickets = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getTicketsBySpaceId(this.id, includeClosed, includeOthers);
 		return tickets;
 	}
 	
@@ -79,6 +82,17 @@ public class Space implements Serializable
 	public String name() { return this.name; }
 	public String getName() { return this.name; }
 	
+	/**
+	 * 
+	 */
+	public Space clone(){
+		try{
+			return (Space) super.clone();
+		}catch ( CloneNotSupportedException e ){
+			return null;
+		}
+	}
+	
 	public String toString() {
 		try {
 			return "[Space] id = " + id + 
@@ -91,5 +105,23 @@ public class Space implements Serializable
 			" ; description = " + description +
 			" ; tickets = \n[" + "EXCEPTION raised while retrieving tickets" + "]";
 		}
+	}
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

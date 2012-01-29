@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class Task implements Serializable{
+public class Task implements Serializable,Cloneable{
     // http://stackoverflow.com/questions/285793/why-should-i-bother-about-serialversionuid
     private static final long serialVersionUID = 7255606712122917833L;
     
@@ -34,6 +34,10 @@ public class Task implements Serializable{
 	private long milliseconds = 0;
 	
 	
+	public Task() {
+		
+	}
+	
 	// Constructor used when creating a new task from the timer
 	public Task(String spaceId, int ticketId) {
 		this.spaceId = spaceId;
@@ -56,7 +60,7 @@ public class Task implements Serializable{
 	}
 	
 	public String toString() {
-		return "[Task #" + Integer.toString(id) + " " + state.toString() + "]" +
+		return "[Task #" + Integer.toString(id) + " " + state + "]" +
 			" ; beginAt = " + (beginAt != null ? beginAt.toString() : "") + 
 			" ; resumeAt = " + (lastResumedAt != null ? lastResumedAt.toString() : "") + 
 			" ; endAt = " + (endAt != null ? endAt.toString() : "") + 
@@ -309,5 +313,16 @@ public class Task implements Serializable{
 	 */
 	public void set_id(long _id) {
 		this._id = _id;
+	}
+	
+	/**
+	 * 
+	 */
+	public Task clone(){
+		try{
+			return (Task) super.clone();
+		}catch ( CloneNotSupportedException e ){
+			return null;
+		}
 	}
 }
