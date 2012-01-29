@@ -1,12 +1,13 @@
 package com.starredsolutions.assemblandroid.asyncTask;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.starredsolutions.assemblandroid.TimeTrackerModel;
 import com.starredsolutions.assemblandroid.models.Space;
 
 
-public class ProjectsLoadingTask extends AssemblaAsyncTask<Void, Void, ArrayList<Space>>
+public class ProjectsLoadingTask extends AssemblaAsyncTask<Void, Void, List<Space>>
 {
 	private static final String LOG_TAG = ProjectsLoadingTask.class.getSimpleName();
 	
@@ -24,9 +25,9 @@ public class ProjectsLoadingTask extends AssemblaAsyncTask<Void, Void, ArrayList
 	}
     	
 	@Override
-	protected ArrayList<Space> doInBackground(Void... params)
+	protected List<Space> doInBackground(Void... params)
 	{
-		ArrayList<Space> spaces = null;
+		List<Space> spaces = null;
 		//Log.i(TAG, "doInBackground");
         try
         {

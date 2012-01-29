@@ -2,6 +2,7 @@ package com.starredsolutions.assemblandroid;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
@@ -24,7 +25,7 @@ public class TimeTrackerModel
      * VARIABLES
      *********************************************************************************************/
     
-    private ArrayList<Space> _spaces;
+    private List<Space> _spaces;
     
     private Space  _currentSpace;
     private Ticket _currentTicket;
@@ -36,7 +37,7 @@ public class TimeTrackerModel
     /*********************************************************************************************
      * SIMPLE GETTERS & SETTERS
      *********************************************************************************************/
-    public ArrayList<Space> spaces() { return _spaces; }
+    public List<Space> spaces() { return _spaces; }
     public Space  curSpace()  { return _currentSpace; }
     public Ticket curTicket() { return _currentTicket; }
     public Task   curTask()   { return _currentTask; }
@@ -114,7 +115,8 @@ public class TimeTrackerModel
      * @return a memento from current object
      */
     public Serializable createMemento() {
-        return new Memento(_currentActivity, _spaces, _currentSpace, _currentTicket, _currentTask);
+        //return new Memento(_currentActivity, _spaces, _currentSpace, _currentTicket, _currentTask);
+    	return null;
     }
     
     
@@ -138,7 +140,7 @@ public class TimeTrackerModel
         _currentTask     = memento._currentTask;
     }
     
-	public ArrayList<Space> reloadSpaces() throws AssemblaAPIException, XMLParsingException, RestfulException
+	public List<Space> reloadSpaces() throws AssemblaAPIException, XMLParsingException, RestfulException
 	{
 		return _spaces = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getMySpaces();
 	}

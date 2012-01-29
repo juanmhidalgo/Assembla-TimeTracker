@@ -3,7 +3,7 @@ package com.starredsolutions.assemblandroid.asyncTask;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
 
-public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayList<Task>> implements IAsynctaskObservable
+public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, List<Task>> implements IAsynctaskObservable
 {
 	private static final String LOG_TAG = TasksLoadingTask.class.getSimpleName();
 	
@@ -19,10 +19,10 @@ public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayL
    	}
     	
    	@Override
-	protected ParsedArrayList<Task> doInBackground(Void... params) {
+	protected List<Task> doInBackground(Void... params) {
 		//Log.i(TAG, "doInBackground");
    		
-   		ParsedArrayList<Task> tasks;
+   		List<Task> tasks;
 		try {
 			tasks  = _ticket.reloadTasks();
 	        _count = tasks.size();
@@ -41,7 +41,7 @@ public class TasksLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayL
 		return tasks;
 	}
 		
-	protected void onPostExecute(ParsedArrayList<Task> tasks)
+	protected void onPostExecute(List<Task> tasks)
 	{
 		_listener.tasksLoadReport(_count, _loadingSeconds, _parsingSeconds, _exception);
 		

@@ -1,6 +1,6 @@
 package com.starredsolutions.assemblandroid.models;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
@@ -13,7 +13,7 @@ public class User {
 	String username = null;
 	String password = null;
 	
-	ArrayList<Space> spaces = null;
+	List<Space> spaces = null;
 	
 	
 	/**
@@ -23,7 +23,7 @@ public class User {
 	 * @throws RestfulException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ArrayList<Space> getMySpaces() throws XMLParsingException, AssemblaAPIException, RestfulException {
+	public List<Space> getMySpaces() throws XMLParsingException, AssemblaAPIException, RestfulException {
 		if (spaces == null)
 			spaces = AssemblaAPIAdapter.getInstance(TimeTrackerApplication.getInstance().getApplicationContext()).getMySpaces();
 		

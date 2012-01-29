@@ -3,7 +3,6 @@ package com.starredsolutions.assemblandroid;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -16,13 +15,13 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.assemblandroid.models.TicketComparator;
+import com.starredsolutions.assemblandroid.parsers.AssemblaParser;
 import com.starredsolutions.net.RequestMethod;
 import com.starredsolutions.net.RestfulClient;
 import com.starredsolutions.net.RestfulException;
@@ -129,38 +128,6 @@ public class AssemblaAPIAdapter {
 		return node.getStringValue();
 	}
 	
-	/**
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private Integer getNodeValueAsInteger(Node node){
-		if(node == null){
-			return null;
-		}
-		String value = this.getNodeValueAsString(node);
-		if(value != null){
-			return new Integer(value);
-		}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private Float getNodeValueAsFloat(Node node){
-		if(node == null){
-			return null;
-		}
-		String value = this.getNodeValueAsString(node);
-		if(value != null){
-			return new Float(value);
-		}
-		return null;
-	}
-	
 	
 	/**
 	 * GET http://www.assembla.com/spaces/<space_id>
@@ -180,19 +147,7 @@ public class AssemblaAPIAdapter {
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
         
-        String id, name, description;
-		try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			id 			= this.getNodeValueAsString(doc.selectSingleNode("/space/id"));
-			name        = this.getNodeValueAsString(doc.selectSingleNode("/space/name"));
-			description = this.getNodeValueAsString(doc.selectSingleNode("/space/description"));
-			
-			return new Space(id, name, description);
-			
-		} catch (Exception e) {
-			throw new XMLParsingException("Error while parsing Space XML", e);
-		}
+        return AssemblaParser.parseSpace(response);
 	}
 	
 	/**
@@ -202,7 +157,7 @@ public class AssemblaAPIAdapter {
 	 * @throws RestfulException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ArrayList<Space> getMySpaces() throws XMLParsingException, RestfulException, AssemblaAPIException {
+	public List<Space> getMySpaces() throws XMLParsingException, RestfulException, AssemblaAPIException {
 		String url = "https://www.assembla.com/spaces/my_spaces";
 		
 		String response = request(RequestMethod.GET, url);
@@ -213,34 +168,7 @@ public class AssemblaAPIAdapter {
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
         
-		ArrayList<Space> spaces = new ArrayList<Space>();
-        String id, name, description;
-        
-		try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			
-			List<Node> nodes = (List<Node>) doc.selectNodes("/spaces/space");
-			
-			for(int i=0; i<nodes.size() ; i++) {
-				org.dom4j.Node node = nodes.get(i);
-				
-				id          = this.getNodeValueAsString(node.selectSingleNode("id"));
-				name        = this.getNodeValueAsString(node.selectSingleNode("name"));
-				description = this.getNodeValueAsString(node.selectSingleNode("description"));
-				
-				
-				spaces.add( new Space(id, name, description) );
-				
-			}
-			
-		}
-		catch (Exception e)
-		{
-			throw new XMLParsingException("Error while parsing MySpaces XML", e);
-		}
-		
-		return spaces;
+		return AssemblaParser.parseSpaceList(response);
 	}
 	
 	
@@ -306,7 +234,7 @@ public class AssemblaAPIAdapter {
 	 * @throws XMLParsingException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ParsedArrayList<Ticket> getTicketsBySpaceId(String spaceId, boolean includeClosed, boolean includeOthers) 
+	public List<Ticket> getTicketsBySpaceId(String spaceId, boolean includeClosed, boolean includeOthers) 
 				throws RestfulException, XMLParsingException, AssemblaAPIException
 		{
 		String url;
@@ -325,72 +253,8 @@ public class AssemblaAPIAdapter {
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
 		
-		ParsedArrayList<Ticket> tickets = new ParsedArrayList<Ticket>();
-        
-		int id, number, priority, status;
-		String statusName, description, summary, assignedToId;
-		float workingHours, workedHours;
-		
-		skippedTickets = 0;
-        
-		
-		try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			List<Node> nodes =  (List<Node>) doc.selectNodes("/tickets/ticket");
-			
-			for(int i=0; i<nodes.size() ; i++) {
-				Node node = nodes.get(i);
-				
-				// First, check that the ticket belongs to me, or is unassigned
-				assignedToId = this.getNodeValueAsString(node.selectSingleNode("assigned-to-id"));
-				
-				// Filter other people tickets if requested
-				if (!includeOthers) {
-					if ( !assignedToId.equals(userId) && assignedToId.length() > 0)  {
-						skippedTickets++;
-						continue;
-					}
-				}
-				
-				id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
-				number       = this.getNodeValueAsInteger(node.selectSingleNode("number"));
-				priority     = this.getNodeValueAsInteger(node.selectSingleNode("priority"));
-				status       = this.getNodeValueAsInteger(node.selectSingleNode("status"));
-				
-				statusName   = this.getNodeValueAsString(node.selectSingleNode("status-name"));
-				description  = this.getNodeValueAsString(node.selectSingleNode("description"));
-				summary      = this.getNodeValueAsString(node.selectSingleNode("summary"));
-				workingHours = this.getNodeValueAsFloat(node.selectSingleNode("working-hours"));
-				
-				description  = TextUtils.htmlEncode(description);
-				
-				// Save workedHours only if the custom-field is present
-				String tmpStr = this.getNodeValueAsString(node.selectSingleNode("custom-fields/custom-field[@name='workedhours']"));
-				
-				workedHours   =  !TextUtils.isEmpty(tmpStr) ?  new Float(tmpStr) : 0.0f;
-				
-				String lastLogMsg = this.getNodeValueAsString(node.selectSingleNode("custom-fields/custom-field[@name='lastlogmessage']"));
-				
-				// overwrite the spaceId received as argument
-				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
-				
-				
-				Ticket ticket = new Ticket(id, number, priority, status, statusName, description, 
-						summary, workingHours, workedHours, spaceId, assignedToId, lastLogMsg);
-				
-				tickets.add(ticket);
-			}
-			
-			// Sort tickets
-			Collections.sort(tickets, new TicketComparator());
-			tickets.setSkippedItems(skippedTickets);
-			
-			
-		} catch (Exception e){
-			throw new XMLParsingException("Error while parsing Tickets XML", e);
-		}
-
+        List<Ticket> tickets = AssemblaParser.parseTicketList(response, includeOthers, userId);
+		Collections.sort(tickets, new TicketComparator());
 		
 		return tickets;
 	}
@@ -405,7 +269,7 @@ public class AssemblaAPIAdapter {
 	 * @throws XMLParsingException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ParsedArrayList<Task> getTasksBySpaceIdAndTicketNumber(String spaceId, int number) throws RestfulException, XMLParsingException, AssemblaAPIException {
+	public List<Task> getTasksBySpaceIdAndTicketNumber(String spaceId, int number) throws RestfulException, XMLParsingException, AssemblaAPIException {
 		String url = "https://www.assembla.com/spaces/" + spaceId + "/tickets/" + Integer.toString(number);
 		
 		String response = request(RequestMethod.GET, url);
@@ -415,38 +279,7 @@ public class AssemblaAPIAdapter {
 				Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
-		
-		ParsedArrayList<Task> tasks = new ParsedArrayList<Task>();
-        
-		int id, ticketId;
-		Date beginAt = null, endAt = null;
-		float hours;
-		String description, userId;
-		
-        try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			List<Node> nodes =  (List<Node>) doc.selectNodes("/ticket/tasks/task");
-			
-			for(int i=0; i<nodes.size() ; i++) {
-				Node node = nodes.get(i);
-				
-				id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
-				hours        = this.getNodeValueAsFloat(node.selectSingleNode("hours"));
-				description  = this.getNodeValueAsString(node.selectSingleNode("description"));
-				ticketId     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-id"));
-				userId       = this.getNodeValueAsString(node.selectSingleNode("user-id"));
-				// overwrite the spaceId received as argument
-				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
-
-				Task task = new Task(id, beginAt, endAt, hours, description, spaceId, ticketId, number, userId);
-				tasks.add(task);
-				
-			}
-		}catch (Exception e){
-			throw new XMLParsingException("Error while parsing Tasks XML", e);
-		}
-		return tasks;
+		return AssemblaParser.parseTaskList(response);
 	}
 	
 	/**
@@ -458,7 +291,7 @@ public class AssemblaAPIAdapter {
 	 * @throws XMLParsingException 
 	 * @throws AssemblaAPIException 
 	 */
-	public ArrayList<Task> getTasks() throws RestfulException, XMLParsingException, AssemblaAPIException {
+	public List<Task> getTasks() throws RestfulException, XMLParsingException, AssemblaAPIException {
 		String url = "https://www.assembla.com/user/time_entries";
 		
 		String response = request(RequestMethod.GET, url);
@@ -469,40 +302,22 @@ public class AssemblaAPIAdapter {
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
 		
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		
-		int id, ticketId,number;
-		Date beginAt = null, endAt = null;
-		float hours;
-		String description, userId, spaceId;
-		
-		try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			List<Node> nodes =  (List<Node>) doc.selectNodes("/tasks/task");
-			
-			for(int i=0; i<nodes.size() ; i++) {
-				Node node = nodes.get(i);
-				
-				id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
-				hours        = this.getNodeValueAsFloat(node.selectSingleNode("hours"));
-				description  = this.getNodeValueAsString(node.selectSingleNode("description"));
-				ticketId     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-id"));
-				number	     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-number"));
-				userId       = this.getNodeValueAsString(node.selectSingleNode("user-id"));
-				// overwrite the spaceId received as argument
-				spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
-				
-				Task task = new Task(id, beginAt, endAt, hours, description, spaceId, ticketId, number, userId);
-				tasks.add(task);
-				
-			}
-		}catch (Exception e){
-			throw new XMLParsingException("Error while parsing Tasks XML", e);
-		}
-		return tasks;
+		return AssemblaParser.parseTaskList(response);
 	}
-	
+
+	/**
+	 * 
+	 * @param space_id
+	 * @param ticket_id
+	 * @param hours
+	 * @param beginAt
+	 * @param endAt
+	 * @param description
+	 * @return
+	 * @throws AssemblaAPIException
+	 * @throws RestfulException
+	 * @throws XMLParsingException
+	 */
 	public Task saveTicketTask(String space_id,int ticket_id,float hours,Date beginAt,Date endAt,String description)throws AssemblaAPIException, RestfulException, XMLParsingException{
 		String url = "https://www.assembla.com/user/time_entries";
 		
@@ -523,30 +338,7 @@ public class AssemblaAPIAdapter {
 				Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
-		int id, ticketId,number;
-		
-		float tmpHours;
-		String tmpDescription, userId, spaceId;
-		try {
-			Document doc = reader.read( stringToInputStream(response) );
-			
-			Node node = doc.selectSingleNode("/task");
-			id           = this.getNodeValueAsInteger(node.selectSingleNode("id"));
-			tmpHours     = this.getNodeValueAsFloat(node.selectSingleNode("hours"));
-			tmpDescription  = this.getNodeValueAsString(node.selectSingleNode("description"));
-			ticketId     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-id"));
-			number	     = this.getNodeValueAsInteger(node.selectSingleNode("ticket-number"));
-			userId       = this.getNodeValueAsString(node.selectSingleNode("user-id"));
-			// overwrite the spaceId received as argument
-			spaceId      = this.getNodeValueAsString(node.selectSingleNode("space-id"));
-			
-			Task task = new Task(id, beginAt, endAt, tmpHours, tmpDescription, spaceId, ticketId, number, userId);
-			return task;
-			
-		} catch (Exception e) {
-			throw new XMLParsingException("Error occured while parsing user profile XML", e);
-		}
-		
+		return AssemblaParser.parseTask(response);
 	}
 	
 	/**

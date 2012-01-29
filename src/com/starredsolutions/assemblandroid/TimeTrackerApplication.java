@@ -10,11 +10,11 @@ import android.accounts.AccountManager;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -26,7 +26,6 @@ import com.starredsolutions.assemblandroid.asyncTask.IProjectsLoadingListener;
 import com.starredsolutions.assemblandroid.asyncTask.ITasksLoadingListener;
 import com.starredsolutions.assemblandroid.asyncTask.ITicketsLoadingListener;
 import com.starredsolutions.assemblandroid.asyncTask.ITimeEntrySavingListener;
-import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.asyncTask.ProjectsLoadingTask;
 import com.starredsolutions.assemblandroid.asyncTask.SaveTimeEntryTask;
 import com.starredsolutions.assemblandroid.asyncTask.TasksLoadingTask;
@@ -78,8 +77,7 @@ public class TimeTrackerApplication extends Application
     private SnapshotManager _snapshotManager;
 	
 	private AssemblaAPIAdapter _assemblaAdapter;
-
-	private SharedPreferences _preferences;
+	
 	
 	public String username;
 	public String password;
@@ -124,7 +122,6 @@ public class TimeTrackerApplication extends Application
 			username = ac[0].name;
 			password = mAccountManager.getPassword(ac[0]);
 		}
-		
 	}
 	
 	
@@ -157,6 +154,7 @@ public class TimeTrackerApplication extends Application
 		if((currentTask == null) || !currentTask.isStarted()){
 			//TODO throw exception
 		}
+		
 		(new Thread(new Runnable() {
 			
 			public void run() {
@@ -244,7 +242,7 @@ public class TimeTrackerApplication extends Application
 		ContentResolver mProvider = this.getContentResolver();
 		AssemblaAPIAdapter apiClient = AssemblaAPIAdapter.getInstance(this);
 		apiClient.setCredentials(username, password);
-		ArrayList<Ticket> tickets = apiClient.getTicketsBySpaceId(spaceId, false, false);
+		List<Ticket> tickets = apiClient.getTicketsBySpaceId(spaceId, false, false);
 		if(tickets != null){
 			for(Ticket tk:tickets){
 				cv.clear();
@@ -410,7 +408,7 @@ public class TimeTrackerApplication extends Application
 	
 	
 	
-	public ArrayList<Space> getSpaces(){
+	public List<Space> getSpaces(){
 		return _model.spaces();
 	}
 	
@@ -684,11 +682,11 @@ public class TimeTrackerApplication extends Application
 
 	public void tasksLoadReport(int count, int loadingSeconds, int parsingSeconds, Exception e)
 	{
-		ParsedArrayList<Task> tasks = _model.curTicket().getTasks();
+		List<Task> tasks = _model.curTicket().getTasks();
 		if (tasks != null)
 		{
-	        int totalTasks = tasks.size() + tasks.getSkippedItems();	        
-	        toast(String.format("Found %d/%d tasks available.", tasks.size(), totalTasks));
+	        //int totalTasks = tasks.size() + tasks.getSkippedItems();	        
+	        //toast(String.format("Found %d/%d tasks available.", tasks.size(), totalTasks));
 		}
 		else if(e != null)
 			manageException(e);
@@ -696,11 +694,11 @@ public class TimeTrackerApplication extends Application
 
 	public void ticketsLoadReport(int count, int loadingSeconds, int parsingSeconds, Exception e)
 	{
-		ParsedArrayList<Ticket> tickets = _model.curSpace().getTickets();
+		List<Ticket> tickets = _model.curSpace().getTickets();
 		if(tickets != null)
 		{
-			int totalTickets = tickets.size() + tickets.getSkippedItems();
-			toast(String.format("Found %d/%d tickets available.", tickets.size(), totalTickets));
+			//int totalTickets = tickets.size() + tickets.getSkippedItems();
+			//toast(String.format("Found %d/%d tickets available.", tickets.size(), totalTickets));
 		}
 		else if(e != null)
 			manageException(e);
@@ -708,7 +706,7 @@ public class TimeTrackerApplication extends Application
 
 	public void projectsLoadReport(int count, int loadingSeconds, int parsingSeconds, Exception e)
 	{
-		ArrayList<Space> spaces = _model.spaces();
+		List<Space> spaces = _model.spaces();
 		if(spaces != null)
 			toast(String.format("Found %d spaces available.", spaces.size()));
 		else if(e != null)

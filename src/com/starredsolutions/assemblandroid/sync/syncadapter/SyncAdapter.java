@@ -19,6 +19,7 @@ package com.starredsolutions.assemblandroid.sync.syncadapter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.http.ParseException;
@@ -35,12 +36,10 @@ import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
 import com.starredsolutions.assemblandroid.Constants;
-import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.models.Space;
@@ -111,7 +110,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
              // fetch updates from the sample service over the cloud
             try {
 				AssemblaAPIAdapter.getInstance(getContext()).setCredentials(account.name, mAccountManager.getPassword(account));
-				ArrayList<Space> spaces = AssemblaAPIAdapter.getInstance(getContext()).getMySpaces();
+				List<Space> spaces = AssemblaAPIAdapter.getInstance(getContext()).getMySpaces();
 				if(spaces != null){
 					Cursor c = null;
 					ContentValues cv = new ContentValues();
@@ -183,7 +182,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     	
 		Cursor c = null;
 		ContentValues cv = new ContentValues();
-		ArrayList<Ticket> tickets = AssemblaAPIAdapter.getInstance(getContext()).getTicketsBySpaceId(sp.getId(), false, false);
+		List<Ticket> tickets = AssemblaAPIAdapter.getInstance(getContext()).getTicketsBySpaceId(sp.getId(), false, false);
 		if(tickets != null){
 			for(Ticket tk:tickets){
 				cv.clear();
@@ -220,7 +219,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private void syncTasks() throws XMLParsingException, AssemblaAPIException, RestfulException, RemoteException{
     	
-    	ArrayList<Task> tasks = AssemblaAPIAdapter.getInstance(getContext()).getTasks();
+    	List<Task> tasks = AssemblaAPIAdapter.getInstance(getContext()).getTasks();
     	
     	if(tasks != null){
     		Cursor c = null;

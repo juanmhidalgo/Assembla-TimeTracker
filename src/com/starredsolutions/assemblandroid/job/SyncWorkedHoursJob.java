@@ -1,10 +1,9 @@
 package com.starredsolutions.assemblandroid.job;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.asyncTask.ParsedArrayList;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.assemblandroid.models.Space;
@@ -57,7 +56,7 @@ public class SyncWorkedHoursJob {
 	}
 	
 	public void syncAllSpaces() throws XMLParsingException, AssemblaAPIException, RestfulException {
-	    ArrayList<Space> spaces = _assemblaAdapter.getMySpaces();
+	    List<Space> spaces = _assemblaAdapter.getMySpaces();
 	    log("\t => Found " + Integer.toString(spaces.size()) + " spaces.\n");
 	    
 	    for (Space space : spaces) {
@@ -68,7 +67,7 @@ public class SyncWorkedHoursJob {
 	public void syncSpace(Space space) throws XMLParsingException, AssemblaAPIException, RestfulException {
 		log("\n\t => Syncronizing space '" + space.name() + "'\n");
 		
-		ParsedArrayList<Ticket> tickets = space.reloadTickets(true, true);
+		List<Ticket> tickets = space.reloadTickets(true, true);
 		
 		if (tickets != null) {
 			for(Ticket ticket : tickets)
@@ -79,7 +78,7 @@ public class SyncWorkedHoursJob {
 	public void syncTicket(String spaceId, Ticket t) throws XMLParsingException, AssemblaAPIException, RestfulException {
 		log(String.format("\n\t\t ** Syncronizing ticket #%d '%s'\n", t.number(), t.name()) );
 		
-		ParsedArrayList<Task> tasks = t.reloadTasks();
+		List<Task> tasks = t.reloadTasks();
 		
 		float hours = 0.0f;
 		

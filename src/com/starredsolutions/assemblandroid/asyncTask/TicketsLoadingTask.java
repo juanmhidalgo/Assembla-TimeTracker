@@ -3,7 +3,7 @@ package com.starredsolutions.assemblandroid.asyncTask;
 import com.starredsolutions.assemblandroid.models.Space;
 import com.starredsolutions.assemblandroid.models.Ticket;
 
-public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArrayList<Ticket>>
+public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, List<Ticket>>
 {
 	public static final String LOG_TAG = TicketsLoadingTask.class.getSimpleName();
 	
@@ -19,9 +19,9 @@ public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArra
 	}
 	
 	@Override
-	protected ParsedArrayList<Ticket> doInBackground(Void... params)
+	protected List<Ticket> doInBackground(Void... params)
 	{
-		ParsedArrayList<Ticket> tickets;
+		List<Ticket> tickets;
 		try
 		{
 			tickets = _space.reloadTickets(false, false);
@@ -42,7 +42,7 @@ public class TicketsLoadingTask extends AssemblaAsyncTask<Void, Void, ParsedArra
 		return tickets;
 	}
 	
-	protected void onPostExecute(ParsedArrayList<Ticket> tickets)
+	protected void onPostExecute(List<Ticket> tickets)
 	{
       	_listener.ticketsLoadReport(_count, _loadingSeconds, _parsingSeconds, _exception);
       	
