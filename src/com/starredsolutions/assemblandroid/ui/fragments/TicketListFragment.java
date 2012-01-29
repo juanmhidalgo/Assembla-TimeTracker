@@ -103,7 +103,7 @@ public class TicketListFragment extends ListFragment implements
 			if(c != null){
 				mTicketNumber = c.getInt(c.getColumnIndex(Tickets.NUMBER));
 				mTicketId = c.getInt(c.getColumnIndex(Tickets.TICKET_ID));
-				mTicketDescription = c.getString(c.getColumnIndex(Tickets.DESCRIPTION));
+				mTicketDescription = c.getString(c.getColumnIndex(Tickets.SUMMARY));
 			}
 		}catch(Exception e){
 			e.printStackTrace();
