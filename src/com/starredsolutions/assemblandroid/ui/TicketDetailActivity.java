@@ -3,18 +3,15 @@
  */
 package com.starredsolutions.assemblandroid.ui;
 
-import android.content.ContentUris;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.TabHost;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
-import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.models.Task;
-import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
+import com.starredsolutions.assemblandroid.ui.fragments.TaskListFragment;
+import com.starredsolutions.assemblandroid.ui.fragments.TicketDetailFragment;
+import com.starredsolutions.utils.TabManager;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -23,13 +20,31 @@ import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
 public class TicketDetailActivity extends ActionBarActivity{
 	private static final String TAG = "TicketDetailActivity"; 
 	private static final boolean LOGV = Log.isLoggable(TAG, Log.VERBOSE) || Constants.DEVELOPER_MODE;
-	
+	TabHost mTabHost;
+    TabManager mTabManager;
+    
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.ticket_details);
+        setContentView(R.layout.fragment_tabs);
         setTitle(R.string.tickets_detail_title);
+
+        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
+        mTabHost.setup();
+        
+        mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
+        
+        mTabManager.addTab(mTabHost.newTabSpec("details").setIndicator("Details"),
+        		TicketDetailFragment.class, null);
+        
+        mTabManager.addTab(mTabHost.newTabSpec("tasks").setIndicator("Tasks"),
+                TaskListFragment.class, null);
+        
+        if (savedInstanceState != null) {
+            mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+        }
+        /*
         
         final Button btnStart = (Button) findViewById(R.id.btnStart);
 		final Button btnStop = (Button) findViewById(R.id.btnStop);
@@ -66,6 +81,12 @@ public class TicketDetailActivity extends ActionBarActivity{
 				v.setVisibility(View.GONE);
 				btnStart.setVisibility(View.VISIBLE);
 			}
-		});
+		});*/
+    }
+	
+	@Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("tab", mTabHost.getCurrentTabTag());
     }
 }
