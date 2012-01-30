@@ -279,7 +279,7 @@ public class AssemblaAPIAdapter {
 				Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
 			throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 		}
-		return AssemblaParser.parseTaskList(response);
+		return AssemblaParser.parseTaskListFromTicket(response);
 	}
 	
 	/**

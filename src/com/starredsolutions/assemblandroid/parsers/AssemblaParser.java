@@ -283,6 +283,101 @@ public class AssemblaParser{
 	 * @param xmlContent
 	 * @return
 	 */
+	public static List<Task> parseTaskListFromTicket(String xmlContent) {
+		final Task currentTask = new Task();
+		final List<Task> tasks = new ArrayList<Task>();
+		RootElement root = new RootElement("ticket");
+		Element tasksElement = root.getChild("tasks"); 
+		Element task = tasksElement.getChild("task");
+		
+		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		
+		task.setEndElementListener(new EndElementListener() {
+			public void end() {
+				tasks.add(currentTask.clone());
+			}
+		});
+		
+		task.getChild("id").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setId(Integer.valueOf(body));
+			}
+		});
+		
+		task.getChild("hours").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setHours(Float.valueOf(body));
+			}
+		});
+		
+		task.getChild("description").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setDescription(body);
+			}
+		});
+		
+		task.getChild("ticket-id").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setTicketId(Integer.valueOf(body));
+			}
+		});
+		
+		task.getChild("ticket-number").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setTicketNumber(Integer.valueOf(body));
+			}
+		});
+		
+		task.getChild("user-id").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setUserId(body);
+			}
+		});
+		
+		task.getChild("space-id").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				currentTask.setSpaceId(body);
+			}
+		});
+		
+		task.getChild("created-at").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				try {
+					currentTask.setBeginAt(sdf.parse(body));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		task.getChild("end-at").setEndTextElementListener(new EndTextElementListener() {
+			public void end(String body) {
+				try {
+					currentTask.setEndAt(sdf.parse(body));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		
+		
+		try {
+			Xml.parse(xmlContent, root.getContentHandler());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		return tasks;
+	}
+	
+	/**
+	 * 
+	 * @param xmlContent
+	 * @return
+	 */
 	public static Task parseTask(String xmlContent) {
 		final Task currentTask = new Task();
 		RootElement root = new RootElement("task");
