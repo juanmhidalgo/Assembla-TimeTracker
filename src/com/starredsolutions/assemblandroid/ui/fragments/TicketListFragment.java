@@ -39,6 +39,7 @@ public class TicketListFragment extends ListFragment implements
     String mSpaceId = null;
     int mTicketId = 0;
 	int mTicketNumber = 0;
+	long _id = 0;
 	String mTicketDescription = null;
 	
 	@Override
@@ -71,6 +72,7 @@ public class TicketListFragment extends ListFragment implements
         if (savedInstanceState != null) {
             // Restore last state for checked position.
             mCurCheckPosition = savedInstanceState.getInt("curChoice", 0);
+            _id = savedInstanceState.getLong(Tickets._ID, 0);
             mTicketNumber = savedInstanceState.getInt(Tickets.NUMBER, 0);
             mTicketId = savedInstanceState.getInt(Tickets.TICKET_ID, 0);
             mTicketDescription= savedInstanceState.getString(Tickets.DESCRIPTION);
@@ -81,7 +83,7 @@ public class TicketListFragment extends ListFragment implements
             // In dual-pane mode, the list view highlights the selected item.
             getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             // Make sure our UI is in the correct state.
-            showDetails(mCurCheckPosition);
+            showDetails(mCurCheckPosition,_id);
         }
         
 	}
@@ -90,6 +92,7 @@ public class TicketListFragment extends ListFragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("curChoice", mCurCheckPosition);
+        outState.putLong(Tickets._ID, _id);
         outState.putInt(Tickets.TICKET_ID, mTicketId);
         outState.putInt(Tickets.NUMBER, mTicketNumber);
         outState.putString(Tickets.DESCRIPTION, mTicketDescription);
@@ -109,7 +112,7 @@ public class TicketListFragment extends ListFragment implements
 			e.printStackTrace();
 		}
 		
-        showDetails(position);
+        showDetails(position,id);
     }
 	
 	/**
@@ -117,7 +120,7 @@ public class TicketListFragment extends ListFragment implements
      * displaying a fragment in-place in the current UI, or starting a
      * whole new activity in which it is displayed.
      */
-    void showDetails(int index) {
+    void showDetails(int index,long id) {
     	mCurCheckPosition = index;
     	
     	//TODO Implements Dual Pane
@@ -126,7 +129,7 @@ public class TicketListFragment extends ListFragment implements
             // the list to highlight the selected item and show the data.
             getListView().setItemChecked(index, true);
     	}else{
-    		Uri uri = Tickets.buildTicketUri(String.valueOf(index));
+    		Uri uri = Tickets.buildTicketUri(String.valueOf(id));
     		Intent it = new Intent(Intent.ACTION_VIEW, uri);
     		it.putExtra(Tickets.SPACE_ID, mSpaceId);
     		it.putExtra(Tickets.NUMBER, mTicketNumber);

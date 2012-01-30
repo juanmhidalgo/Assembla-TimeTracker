@@ -64,10 +64,10 @@ public class TicketDetailsActivity extends BaseActivity implements IAsynctaskObs
         
         LinearLayout layout = (LinearLayout) findViewById(R.id.ticketDetailsLayout);
          
-        _txtName = (TextView) layout.findViewById(R.id.txtName);
+        /*_txtName = (TextView) layout.findViewById(R.id.txtName);
         _txtStatus = (TextView) layout.findViewById(R.id.txtStatus);
         _txtHours = (TextView) layout.findViewById(R.id.txtHours);
-        _txtDescription = (TextView) layout.findViewById(R.id.txtDescription);
+        _txtDescription = (TextView) layout.findViewById(R.id.txtDescription);*/
         
         //_listView = (ListView)findViewById(R.id.taskListView);
         

@@ -13,7 +13,6 @@ import com.starredsolutions.utils.TabManager;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
- * TODO Separate in tabs
  */
 public class TicketDetailActivity extends ActionBarActivity{
 	TabHost mTabHost;

@@ -79,5 +79,6 @@
     <string name="status">Status</string>
     <string name="hours">Hours</string>
     <string name="description">Description</string>
+    <string name="priority">Priority</string>
     
 </resources>

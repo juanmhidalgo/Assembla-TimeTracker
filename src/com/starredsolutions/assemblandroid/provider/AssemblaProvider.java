@@ -152,28 +152,29 @@ public class AssemblaProvider extends ContentProvider{
 			case SPACES:
 			case SPACES_ID:
 				qb.setTables(Tables.SPACES);
-				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TICKETS:
 				qb.setTables(Tables.TICKETS);
-				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
+				break;
+			case TICKETS_ID:
+				Log.v(TAG,Tickets._ID + " = " + uri.getPathSegments().get(1));
+				qb.setTables(Tables.TICKETS);
+				qb.appendWhere(Tickets._ID + " = " + uri.getPathSegments().get(1));
 				break;
 			case TICKETS_BY_SPACE:
 				qb.setTables(Tables.TICKETS);
-				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TICKETS_BY_SPACE_AND_NUMBER:
 				qb.setTables(Tables.TICKETS);
-				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TASKS:
 			case TASKS_BY_SPACE:
 			case TASKS_BY_TICKET:
 				qb.setTables(Tables.TASKS);
-				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 		}
 		
+		c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 		
 		if(c != null){
 			c.setNotificationUri(getContext().getContentResolver(), uri);
