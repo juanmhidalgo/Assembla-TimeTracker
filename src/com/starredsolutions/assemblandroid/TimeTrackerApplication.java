@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,9 +39,11 @@ import com.starredsolutions.assemblandroid.models.Task.State;
 import com.starredsolutions.assemblandroid.models.Ticket;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
+import com.starredsolutions.assemblandroid.ui.TicketDetailActivity;
 import com.starredsolutions.assemblandroid.views.DialogThemedActivity;
 import com.starredsolutions.net.RestfulException;
 import com.starredsolutions.utils.LocalPersistenceHelper;
+import com.starredsolutions.utils.base.OnCompleteListener;
 
 
 /**
@@ -150,7 +153,7 @@ public class TimeTrackerApplication extends Application
 	 * 
 	 * @return
 	 */
-	public void stopTicketTask() {
+	public void stopTicketTask(final OnCompleteListener onComplete) {
 		if((currentTask == null) || !currentTask.isStarted()){
 			//TODO throw exception
 		}
@@ -165,7 +168,6 @@ public class TimeTrackerApplication extends Application
 					Task tk = AssemblaAPIAdapter.getInstance(instance)
 							.saveTicketTask(currentTask.getSpaceId(), currentTask.getTicketId(), currentTask.getHours(), 
 											currentTask.getBeginAt(), currentTask.getEndAt(), currentTask.getDescription());
-					
 					
 					
 					LocalPersistenceHelper.deleteObjectFile(instance, Constants.CURRENT_TASK_FNAME);
@@ -187,15 +189,27 @@ public class TimeTrackerApplication extends Application
 					getContentResolver().insert(Tasks.CONTENT_URI, cv);
 					
 					currentTask = null;
+					if(onComplete != null){
+						onComplete.onComplete(true,null);
+					}
 				} catch (AssemblaAPIException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					if(onComplete != null){
+						onComplete.onComplete(false,e.getMessage());
+					}
 				} catch (XMLParsingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					if(onComplete != null){
+						onComplete.onComplete(false,e.getMessage());
+					}
 				} catch (RestfulException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					if(onComplete != null){
+						onComplete.onComplete(false,e.getMessage());
+					}
 				}
 			}
 		})).start();
@@ -273,9 +287,9 @@ public class TimeTrackerApplication extends Application
 					cv.put(Tickets.WORKING_HOURS, tk.getWorkingHours());
 					mProvider.insert(Tickets.CONTENT_URI, cv);
 				}
-				if(syncTasks){
-					syncTasksForSpaceAndTicketNumber(spaceId, tk.getNumber());
-				}
+			}
+			if(syncTasks){
+				this.syncTasks();
 			}
 		}
 	}
@@ -337,6 +351,50 @@ public class TimeTrackerApplication extends Application
 					mProvider.insert(Tasks.CONTENT_URI, cv);
     			}
     		}
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws XMLParsingException
+	 * @throws AssemblaAPIException
+	 * @throws RestfulException
+	 */
+	public void syncTasks() throws XMLParsingException, AssemblaAPIException, RestfulException{
+		Cursor c = null;
+		ContentValues cv = new ContentValues();
+		
+		ContentResolver mProvider = this.getContentResolver();
+		AssemblaAPIAdapter apiClient = AssemblaAPIAdapter.getInstance(this);
+		apiClient.setCredentials(username, password);
+		
+		List<Task> tasks = apiClient.getTasks();
+		if(tasks != null){
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US);
+			for(Task tk: tasks){
+				cv.clear();
+				c = mProvider.query(Tasks.CONTENT_URI, new String[]{Tasks._ID}, Tasks.TASK_ID + "= ?", new String[]{String.valueOf(tk.getId())}, null);
+				if((c != null) && c.moveToFirst() ){//Already Exists
+					c.close();
+				}else{
+					if(c!= null){
+						c.close();
+					}
+					cv.put(Tasks.TASK_ID,tk.getId());
+					cv.put(Tasks.TICKET_ID,tk.getTicketId());
+					cv.put(Tasks.TICKET_NUMBER,tk.getTicketNumber());
+					cv.put(Tasks.SPACE_ID,tk.getSpaceId());
+					cv.put(Tasks.DESCRIPTION,tk.getDescription());
+					cv.put(Tasks.HOURS,tk.getHours());
+					cv.put(Tasks.USER_ID,tk.getUserId());
+					if(tk.getBeginAt() != null){
+						cv.put(Tasks.BEGIN_AT,sdf.format(tk.getBeginAt()));
+						cv.put(Tasks.END_AT,sdf.format(tk.getEndAt()));
+						cv.put(Tasks.UPDATED_AT,sdf.format(tk.getEndAt()));
+					}
+					mProvider.insert(Tasks.CONTENT_URI, cv);
+				}
+			}
 		}
 	}
 	

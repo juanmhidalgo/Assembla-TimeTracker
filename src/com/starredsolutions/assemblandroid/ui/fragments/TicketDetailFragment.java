@@ -3,6 +3,7 @@
  */
 package com.starredsolutions.assemblandroid.ui.fragments;
 
+import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.models.Task;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
+import com.starredsolutions.utils.base.OnCompleteListener;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -67,7 +69,19 @@ public class TicketDetailFragment extends Fragment {
 		btnStop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if(LOGV) Log.v(TAG,"Stop Ticket [ space_id=" + space_id + ", ticket_id=" +  String.valueOf(ticket_id)+ ", ticket_number=" +  String.valueOf(ticket_number)+"]" );
-				TimeTrackerApplication.getInstance().stopTicketTask();
+				
+				final ProgressDialog mProgressDialog = ProgressDialog.show(getActivity(), "", "Sending to Assembla...");
+				TimeTrackerApplication.getInstance().stopTicketTask(new OnCompleteListener() {
+					
+					public void onComplete(boolean result, String message) {
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								mProgressDialog.dismiss();
+							}
+						});
+						
+					}
+				});
 				v.setVisibility(View.GONE);
 				btnStart.setVisibility(View.VISIBLE);
 			}
