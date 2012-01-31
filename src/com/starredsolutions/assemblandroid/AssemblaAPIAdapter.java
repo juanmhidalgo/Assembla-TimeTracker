@@ -1,15 +1,8 @@
 package com.starredsolutions.assemblandroid;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -52,8 +45,6 @@ public class AssemblaAPIAdapter {
 		return instance;
 	}
 	
-	private SAXReader reader = new SAXReader(); // dom4j SAXReader
-
 	
 	private String username = ""; // "assemblandroid";
 	private String password = ""; // "login";
@@ -68,9 +59,6 @@ public class AssemblaAPIAdapter {
 	public String getUserId() { return this.userId; }
 	
 	
-	static private InputStream stringToInputStream( String str ) throws UnsupportedEncodingException {
-		return new ByteArrayInputStream(str.getBytes("UTF-8"));
-	}
 	
 	
 	/**
@@ -114,18 +102,6 @@ public class AssemblaAPIAdapter {
         client.execute();
         
         return client.getResponse();
-	}
-	
-	/**
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private String getNodeValueAsString(Node node){
-		if(node == null){
-			return "";
-		}
-		return node.getStringValue();
 	}
 	
 	
@@ -203,17 +179,7 @@ public class AssemblaAPIAdapter {
 						Integer.toString(client.getStatusCode()) + " " + client.getStatusPhrase();
 					throw new AssemblaAPIException(msg, url, client.getStatusCode(), client.getStatusPhrase(), response);
 				}
-		        
-				try {
-					Document doc = reader.read( stringToInputStream(response) );
-					
-					userId = this.getNodeValueAsString(doc.selectSingleNode("/user/id"));
-					SettingsHelper.getInstance(this.context).putString(Constants.USERID_KEY, userId);
-					
-					return userId;
-				} catch (Exception e) {
-					throw new XMLParsingException("Error occured while parsing user profile XML", e);
-				}
+		        return AssemblaParser.parseUserId(response);
 			}
 		}
 	}

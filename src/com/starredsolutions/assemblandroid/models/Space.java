@@ -1,10 +1,8 @@
 package com.starredsolutions.assemblandroid.models;
 
 import java.io.Serializable;
+import java.util.List;
 
-import com.starredsolutions.assemblandroid.AssemblaAPIAdapter;
-import com.starredsolutions.assemblandroid.TimeTrackerApplication;
-import com.starredsolutions.assemblandroid.asyncTask.List;
 import com.starredsolutions.assemblandroid.exceptions.AssemblaAPIException;
 import com.starredsolutions.assemblandroid.exceptions.XMLParsingException;
 import com.starredsolutions.net.RestfulException;

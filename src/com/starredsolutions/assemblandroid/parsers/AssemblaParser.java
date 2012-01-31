@@ -456,8 +456,26 @@ public class AssemblaParser{
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
 		return currentTask;
+	}
+	
+	public static String parseUserId(String xmlContent){
+		final StringBuffer currentUserId = new StringBuffer();
+
+		RootElement root = new RootElement("user");
+		root.getChild("id").setEndTextElementListener(new EndTextElementListener() {
+			
+			public void end(String body) {
+				currentUserId.append(body);
+			}
+		});
+		
+		try {
+			Xml.parse(xmlContent, root.getContentHandler());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return currentUserId.toString();
 	}
 	
 
