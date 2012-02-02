@@ -9,18 +9,12 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.adapter.TaskCursorAdapter;
-import com.starredsolutions.assemblandroid.provider.AssemblaContract.Spaces;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tasks;
-import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
-import com.starredsolutions.assemblandroid.ui.ActionBarActivity;
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -50,8 +44,6 @@ public class TaskListFragment extends ListFragment implements
         // Start out with a progress indicator.
         setListShown(false);
 
-        mSpaceId = getActivity().getIntent().getStringExtra(Spaces.SPACE_ID);
-        mTicketNumber = getActivity().getIntent().getIntExtra(Tickets.NUMBER,0);
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
         getLoaderManager().initLoader(0, null, this);
@@ -84,7 +76,8 @@ public class TaskListFragment extends ListFragment implements
 	
 	
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		return new CursorLoader(getActivity(), Tasks.CONTENT_URI, Tasks.PROJECTION, Tasks.SPACE_ID + "= ? AND " + Tasks.TICKET_NUMBER + " = ?", new String[]{mSpaceId, String.valueOf(mTicketNumber)}, null);
+		long ticketId = Long.valueOf(getActivity().getIntent().getData().getPathSegments().get(1));
+		return new CursorLoader(getActivity(), Tasks.buildTasksByTicketUri(ticketId), Tasks.PROJECTION, null,null, null);
 	}
 
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

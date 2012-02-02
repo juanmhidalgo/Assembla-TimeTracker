@@ -34,8 +34,7 @@ public class AssemblaProvider extends ContentProvider{
 	
 	private AssemblaDatabase mOpenHelper;
 
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
-    
+    private static final UriMatcher sUriMatcher;
     
     
     private static final int SPACES = 300;
@@ -49,6 +48,13 @@ public class AssemblaProvider extends ContentProvider{
     private static final int TASKS_ID = 501;
     private static final int TASKS_BY_SPACE = 502;
     private static final int TASKS_BY_TICKET = 503;
+    
+    
+    
+    static{
+    	sUriMatcher = buildUriMatcher();
+    }
+    
     
     private static UriMatcher buildUriMatcher() {
     	final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -152,29 +158,41 @@ public class AssemblaProvider extends ContentProvider{
 			case SPACES:
 			case SPACES_ID:
 				qb.setTables(Tables.SPACES);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TICKETS:
 				qb.setTables(Tables.TICKETS);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TICKETS_ID:
-				Log.v(TAG,Tickets._ID + " = " + uri.getPathSegments().get(1));
 				qb.setTables(Tables.TICKETS);
 				qb.appendWhere(Tickets._ID + " = " + uri.getPathSegments().get(1));
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TICKETS_BY_SPACE:
 				qb.setTables(Tables.TICKETS);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TICKETS_BY_SPACE_AND_NUMBER:
 				qb.setTables(Tables.TICKETS);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
 				break;
 			case TASKS:
 			case TASKS_BY_SPACE:
-			case TASKS_BY_TICKET:
 				qb.setTables(Tables.TASKS);
+				c = qb.query(db, projection, selection, selectionArgs, null, null, null);
+				break;
+			case TASKS_BY_TICKET:
+				StringBuffer sql = new StringBuffer();
+				sql.append("select " + Tables.TASKS + ".* from " + Tables.TASKS);
+				sql.append(" join " + Tables.TICKETS + " ON " + Tables.TASKS + "." + Tasks.TICKET_ID + "=" + Tables.TICKETS + "." + Tickets.TICKET_ID);
+				sql.append(" where " + Tables.TICKETS + "." + Tickets._ID + "= ?");
+				
+				c = db.rawQuery(sql.toString(), new String[]{uri.getPathSegments().get(2)});
 				break;
 		}
 		
-		c = qb.query(db, projection, selection, selectionArgs, null, null, null);
+		
 		
 		if(c != null){
 			c.setNotificationUri(getContext().getContentResolver(), uri);

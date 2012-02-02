@@ -85,7 +85,7 @@ public class AssemblaContract {
 	
 	public static class Tasks implements TasksColumns,BaseColumns{
 		public static final Uri CONTENT_URI =BASE_CONTENT_URI.buildUpon().appendPath(PATH_TASKS).build();
-		public static final String[] PROJECTION = new String[]{_ID,TASK_ID, TICKET_ID, TICKET_NUMBER, SPACE_ID, DESCRIPTION, HOURS, USER_ID, BEGIN_AT, END_AT, UPDATED_AT};
+		public static final String[] PROJECTION = new String[]{_ID,TASK_ID, TICKET_ID,  TICKET_NUMBER, SPACE_ID, DESCRIPTION, HOURS, USER_ID, BEGIN_AT, END_AT, UPDATED_AT};
 		public static final String CONTENT_TYPE ="vnd.android.cursor.dir/vnd.assembla.task";
 		public static final String CONTENT_ITEM_TYPE ="vnd.android.cursor.item/vnd.assembla.task";
 		
