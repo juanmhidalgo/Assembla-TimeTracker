@@ -5,12 +5,14 @@ package com.starredsolutions.assemblandroid.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
+import com.starredsolutions.assemblandroid.provider.AssemblaContract;
 import com.starredsolutions.assemblandroid.sync.authenticator.AuthenticatorActivity;
 
 /**
@@ -37,10 +39,10 @@ public class HomeActivity extends ActionBarActivity{
 	        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
 	        startActivity(intent);
 		}else{
-			/*if(!ContentResolver.isSyncActive(ac[0], AssemblaContract.CONTENT_AUTHORITY) && !ContentResolver.isSyncPending(ac[0], AssemblaContract.CONTENT_AUTHORITY)){
+			if(!ContentResolver.isSyncActive(ac[0], AssemblaContract.CONTENT_AUTHORITY) && !ContentResolver.isSyncPending(ac[0], AssemblaContract.CONTENT_AUTHORITY)){
 				if(LOGV) Log.v(TAG, "Request Sync");
 				ContentResolver.requestSync(ac[0], AssemblaContract.CONTENT_AUTHORITY, new Bundle());
-			}*/
+			}
 		}
 		
 		
