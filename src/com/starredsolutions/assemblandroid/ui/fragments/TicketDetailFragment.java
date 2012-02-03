@@ -3,9 +3,12 @@
  */
 package com.starredsolutions.assemblandroid.ui.fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -16,13 +19,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.starredsolutions.assemblandroid.Constants;
 import com.starredsolutions.assemblandroid.R;
 import com.starredsolutions.assemblandroid.TimeTrackerApplication;
 import com.starredsolutions.assemblandroid.provider.AssemblaContract.Tickets;
+import com.starredsolutions.assemblandroid.ui.TicketDetailActivity;
 import com.starredsolutions.utils.base.OnCompleteListener;
+
+
 
 /**
  * @author Juan M. Hidalgo <juan@starredsolutions.com.ar>
@@ -75,28 +82,45 @@ public class TicketDetailFragment extends Fragment implements LoaderCallbacks<Cu
 				
 			}
 		});
+			
+		
+		final DialogInterface.OnClickListener positiveAction= new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				EditText description = (EditText) ((AlertDialog) dialog).findViewById(R.id.description);
+				if(description != null && description.getText() != null){
+					_app.getCurrentTask().setDescription(description.getText().toString());
+				}
+				stopTaskAction();
+			}
+		}; 
+		
 		btnStop.setOnClickListener(new OnClickListener() {
 			public void onClick(final View v) {
-				if(LOGV) Log.v(TAG,"Stop Ticket [ space_id=" + mSpaceId + ", ticket_id=" +  String.valueOf(mTicketId)+ ", ticket_number=" +  String.valueOf(mTicketNumber)+"]" );
-				
-				final ProgressDialog mProgressDialog = ProgressDialog.show(getActivity(), "", "Sending to Assembla...");
-				TimeTrackerApplication.getInstance().stopTicketTask(new OnCompleteListener() {
-					
-					public void onComplete(boolean result, String message) {
-						getActivity().runOnUiThread(new Runnable() {
-							public void run() {
-								mProgressDialog.dismiss();
-								v.setVisibility(View.GONE);
-								btnStart.setVisibility(View.VISIBLE);
-							}
-						});
+				DialogFragment frag = TicketDetailActivity.StopTaskDialogFragment.newInstance(positiveAction, null);
+				frag.show(getActivity().getSupportFragmentManager(), "stop-task-dialog");
+			}
+		});
+		return v;
+	}
+	
+	protected void stopTaskAction(){
+		if(LOGV) Log.v(TAG,"Stop Ticket [ space_id=" + mSpaceId + ", ticket_id=" +  String.valueOf(mTicketId)+ ", ticket_number=" +  String.valueOf(mTicketNumber)+"]" );
+
+		final ProgressDialog mProgressDialog = ProgressDialog.show(getActivity(), "", "Sending to Assembla...");
+		TimeTrackerApplication.getInstance().stopTicketTask(new OnCompleteListener() {
+
+			public void onComplete(boolean result, String message) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						mProgressDialog.dismiss();
+						btnStop.setVisibility(View.GONE);
+						btnStart.setVisibility(View.VISIBLE);
 					}
 				});
 			}
 		});
-		
-		return v;
 	}
+	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
